@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Ortho_matic.Models.Doctor>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="row" style="width:100%">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header row bg-white m-0">
+                <div class="col-6">
+                    <h4 class="text-info">Hospital</h4>
+                </div>
+                <div class="col-3 offset-3">
+                    <a asp-action="Create" asp-controller="Hospital" class="btn btn-info form-control text-white">
+                        Create
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table" id="DT_load">
+                    <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Lat</th>
+                            <th scope="col">Lon</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/hospital.js" asp-append-version="true"></script>
+}
