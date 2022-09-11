@@ -20,7 +20,7 @@ namespace Ortho_matic.Controllers
 
         public IActionResult Index(int? id)
         {
-            Hospital hospital = new Hospital() { Name = "" };
+            Hospital hospital = new Hospital() { Name = "", Address = "" };
             if (id != null)
             {
                 hospital = _context.Hospitals.FirstOrDefault(obj => obj.Id == id);
@@ -35,73 +35,13 @@ namespace Ortho_matic.Controllers
                 return NotFound();
             }
 
-            var hospital = await _context.Hospitals
+            var hospital = await _context.Hospitals.Include(obj => obj.DoctorHospitals)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (hospital == null)
             {
                 return NotFound();
             }
 
-            return View(hospital);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Address,Latitude,Longitude")] Hospital hospital)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(hospital);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(hospital);
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var hospital = await _context.Hospitals.FindAsync(id);
-            if (hospital == null)
-            {
-                return NotFound();
-            }
-            return View(hospital);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Latitude,Longitude")] Hospital hospital)
-        {
-            if (id != hospital.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(hospital);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!HospitalExists(hospital.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
             return View(hospital);
         }
 
@@ -125,40 +65,20 @@ namespace Ortho_matic.Controllers
             return View(model);
         }
 
-
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var hospital = await _context.Hospitals
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (hospital == null)
-            {
-                return NotFound();
-            }
-
-            return View(hospital);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var hospital = await _context.Hospitals.FindAsync(id);
-            _context.Hospitals.Remove(hospital);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool HospitalExists(int id) => _context.Hospitals.Any(e => e.Id == id);
-
         [HttpGet]
         public async Task<IActionResult> GetAllHospitals()
         {
-            return Json(new { data = await _context.Hospitals.ToListAsync() });
+            return Json(new
+            {
+                data = await _context.Hospitals.Include(obj => obj.DoctorHospitals).Select(obj => new
+                {
+                    Id = obj.Id,
+                    Name = obj.Name,
+                    Address = obj.Address,
+                    PhoneNumber = obj.PhoneNumber,
+                    NumberOfDoctors = obj.DoctorHospitals.Count()
+                }).ToListAsync()
+            });
         }
 
         [HttpDelete]

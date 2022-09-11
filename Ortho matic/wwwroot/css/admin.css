@@ -132,14 +132,9 @@ b{
     
  }
  aside .logo img{
-     width:6rem;
-     height: 4rem;
+     width:180px;
+     height: 80px;
      
- }
- aside .logo img:hover{
-     width:10rem;
-     height:6rem;
-
  }
 
 aside .close{

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Ortho_matic.Data;
 using Ortho_matic.Models;
+using Ortho_matic.Models.ViewModels;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ortho_matic.Controllers
 {
@@ -19,135 +19,172 @@ namespace Ortho_matic.Controllers
             _context = context;
         }
 
-        // GET: Doctors
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Doctors.ToListAsync());
-        }
-
-        // GET: Doctors/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            return View(new DoctorVM
             {
-                return NotFound();
-            }
-
-            var doctor = await _context.Doctors
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (doctor == null)
-            {
-                return NotFound();
-            }
-
-            return View(doctor);
+                Doctor = new Doctor(),
+                DoctorDegreeSelectList = Enum.GetNames(typeof(Degree)).Select(i => new SelectListItem
+                {
+                    Text = i.ToString(),
+                    Value = i.ToString(),
+                }).AsQueryable(),
+                DoctorSpecialtySelectList = Enum.GetNames(typeof(Specialty)).Select(i => new SelectListItem
+                {
+                    Text = i.ToString(),
+                    Value = i.ToString(),
+                }).AsQueryable()
+            });
         }
 
-        // GET: Doctors/Create
-        public IActionResult Create()
+        /* [HttpGet]
+         public async Task<IActionResult> Upsert(int? id)
+         {
+             EmployeeVM employeeVM = new EmployeeVM()
+             {
+                 Employee = new Employee(),
+                 EmployeeSelectList = _db.departments.Select(i => new SelectListItem
+                 {
+                     Text = i.Name,
+                     Value = i.Id.ToString(),
+                 }),
+             };
+             if (id != null)
+             {
+                 employeeVM.Employee = await _db.employees.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
+             }
+             return View(employeeVM);
+         }
+
+         [HttpPost]
+         [ValidateAntiForgeryToken]
+         public IActionResult Upsert(EmployeeVM model)
+         {
+             if (ModelState.IsValid)
+             {
+                 if (model.Employee.Id != 0)
+                 {
+                     _db.employees.Update(model.Employee);
+                 }
+                 else
+                 {
+                     _db.employees.Add(model.Employee);
+                 }
+                 _db.SaveChanges();
+                 return Redirect(nameof(Index));
+             }
+             model.EmployeeSelectList = _db.departments.Select(i => new SelectListItem
+             {
+                 Text = i.Name,
+                 Value = i.Id.ToString(),
+             });
+             return View(model);
+         }
+
+         #region API Calls
+         [HttpGet]
+         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+         public async Task<IActionResult> GetAll()
+         {
+             return Json(new { data = await _db.employees.Include(c => c.Department).ToListAsync() });
+         }
+        */
+        [HttpGet]
+        public async Task<IActionResult> GetAllDoctors()
         {
-            return View();
+            return Json(new
+            {
+                data = await _context.Doctors.Select(obj => new
+                {
+                    obj.PhoneNumber,
+                    obj.Name,
+                    DoctorSpecialty = obj.DoctorSpecialty.ToString(),
+                    obj.Id,
+                    DoctorDegree = obj.DoctorDegree.ToString(),
+                }).ToListAsync()
+            });
         }
 
-        // POST: Doctors/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Specialty,DoctorDegree,PhoneNumber")] Doctor doctor)
+        /*[HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetById(int id)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(doctor);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Json(new { data = await _db.employees.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id) });
             }
-            return View(doctor);
+            return Json(new { success = false, message = "Error while get data" });
         }
 
-        // GET: Doctors/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpPut]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult Update([FromBody] Employee model)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var doctor = await _context.Doctors.FindAsync(id);
-            if (doctor == null)
-            {
-                return NotFound();
-            }
-            return View(doctor);
-        }
-
-        // POST: Doctors/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Specialty,DoctorDegree,PhoneNumber")] Doctor doctor)
-        {
-            if (id != doctor.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
+                var employee = _db.employees.FirstOrDefault(obj => obj.Id == model.Id);
+
+                if (employee == null)
                 {
-                    _context.Update(doctor);
-                    await _context.SaveChangesAsync();
+                    return Json(new { success = false, message = "Error while updating" });
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DoctorExists(doctor.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+
+                employee.Insurance = model.Insurance;
+                employee.JobTitle = model.JobTitle;
+                employee.EnglishName = model.EnglishName;
+                employee.Email = model.Email;
+                employee.Code = model.Code;
+                employee.DepartmentId = model.DepartmentId;
+                employee.Department = model.Department;
+                employee.ArabicName = model.ArabicName;
+
+                _db.SaveChanges();
+
+                return Json(new { success = true, message = "update successfull" });
             }
-            return View(doctor);
+            return Json(new { success = false, message = "Error while updating" });
         }
 
-        // GET: Doctors/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult Insert([FromBody] Employee model)
         {
-            if (id == null)
+            if (ModelState.IsValid && model.Id == 0)
             {
-                return NotFound();
+                _db.employees.Add(model);
+                _db.SaveChanges();
+                return Json(new { success = true, message = "insert successfull" });
             }
+            return Json(new { success = false, message = "Error while adding" });
+        }
 
-            var doctor = await _context.Doctors
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (doctor == null)
+        [HttpDelete]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _db.employees.FirstOrDefaultAsync(obj => obj.Id == id);
+            if (user == null)
             {
-                return NotFound();
+                return Json(new { success = false, message = "Error while deleting" });
             }
-
-            return View(doctor);
+            _db.employees.Remove(user);
+            _db.SaveChanges();
+            return Json(new { success = true, message = "Delete successfull" });
         }
 
-        // POST: Doctors/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteEmployee(int id)
         {
-            var doctor = await _context.Doctors.FindAsync(id);
-            _context.Doctors.Remove(doctor);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            var user = await _db.employees.FirstOrDefaultAsync(obj => obj.Id == id);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            _db.employees.Remove(user);
+            _db.SaveChanges();
+            return Json(new { success = true, message = "Delete successfull" });
         }
 
-        private bool DoctorExists(int id)
-        {
-            return _context.Doctors.Any(e => e.Id == id);
-        }
+        #endregion*/
     }
 }

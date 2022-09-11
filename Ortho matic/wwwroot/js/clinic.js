@@ -7,30 +7,29 @@ $(document).ready(function () {
 function loadDataTable() {
     dataTable = $('#DT_load').DataTable({
         "ajax": {
-            "url": "/Hospitals/GetAllHospitals/",
+            "url": "/Clinics/GetAllClinics/",
             "type": "GET",
             "datatype": "json"
         },
         "columns": [
             { "data": "id" },
-            { "data": "name" },
             { "data": "phoneNumber" },
-            { "data": "address", "width": "25%"},
-            { "data": "numberOfDoctors" },
+            { "data": "address", "width": "30%"},
+            { "data": "numberOfDoctors"},
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="text-center">                  
-                        <a href="/Hospitals/Details?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
+                    return `<div class="text-center">
+                        <a href="/Clinics/Details?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
                             <i class="fa fa-book"></i>
                         </a>
                         &nbsp;
-                        <a href="/Hospitals/Index?id=${data}" class='btn btn-info text-white' style='cursor:pointer;'>
+                        <a href="/Clinics/Index?id=${data}" class='btn btn-info text-white' style='cursor:pointer;'>
                             <i class="fa fa-pencil-alt"></i>
                         </a>
                         &nbsp;
                         <a class='btn btn-danger text-white' style='cursor:pointer;'
-                            onclick=Delete('/Hospitals/DeleteHospitals?id=${data}')>
+                            onclick=Delete('/Clinics/DeleteClinics?id=${data}')>
                             <i class="fa fa-times"></i>
                         </a>
                         </div>`;

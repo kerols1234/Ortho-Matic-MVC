@@ -1,17 +1,46 @@
-﻿@model IEnumerable<Ortho_matic.Models.Doctor>
+﻿@model Ortho_matic.Models.ViewModels.DoctorVM
 
-@{
-    ViewData["Title"] = "Index";
-}
 <div class="row" style="width:100%">
+    <div class="col-12 pb-4">
+        <div class="card custom-card">
+            <div class="card-header bg-white">
+                <h4>Search</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-3">
+                        <label asp-for="Doctor.Name"></label>
+                        <input asp-for="Doctor.Name" id="Name" class="form-control" />
+                    </div>
+                    <div class="form-group col-3">
+                        <label asp-for="Doctor.Id">فئه</label>
+                        <select asp-for="Doctor.Id" id="DoctorDegree" asp-items="@Model.DoctorDegreeSelectList" class="form-control">
+                            <option selected value="">Not Degree</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-3">
+                        <label asp-for="Doctor.Id">فئه</label>
+                        <select asp-for="Doctor.Id" id="DoctorSpecialty" asp-items="@Model.DoctorSpecialtySelectList" class="form-control">
+                            <option selected value="">Not Degree</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-3">
+                        <label asp-for="Doctor.PhoneNumber"></label>
+                        <input asp-for="Doctor.PhoneNumber" id="PhoneNumber" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="col-12">
-        <div class="card">
+        <div class="card custom-card">
             <div class="card-header row bg-white m-0">
                 <div class="col-6">
-                    <h4 class="text-info">Hospital</h4>
+                    <h4 class="text-info">Doctors</h4>
                 </div>
                 <div class="col-3 offset-3">
-                    <a asp-action="Create" asp-controller="Hospital" class="btn btn-info form-control text-white">
+                    <a asp-action="Upsert" asp-controller="Employee" class="btn btn-info form-control text-white">
                         Create
                     </a>
                 </div>
@@ -22,20 +51,33 @@
                         <tr>
                             <th scope="col">Id</th>
                             <th scope="col">Name</th>
-                            <th scope="col">Lat</th>
-                            <th scope="col">Lon</th>
+                            <th scope="col">Degree</th>
+                            <th scope="col">Specialty</th>
+                            <th scope="col">Phone Number</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
+                    <tfoot hidden>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>DoctorDegree</th>
+                            <th>DoctorSpecialty</th>
+                            <th>PhoneNumber</th>
+                            <th>Button</th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
     </div>
+
+
 </div>
 
 @section Scripts{
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/hospital.js" asp-append-version="true"></script>
+    <script src="~/js/doctor.js" asp-append-version="true"></script>
 }

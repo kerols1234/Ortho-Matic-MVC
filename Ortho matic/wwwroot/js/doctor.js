@@ -7,40 +7,53 @@ $(document).ready(function () {
 function loadDataTable() {
     dataTable = $('#DT_load').DataTable({
         "ajax": {
-            "url": "/Hospitals/GetAllHospitals/",
+            "url": "/Doctors/GetAllDoctors/",
             "type": "GET",
             "datatype": "json"
         },
+        "dom": "tr",
         "columns": [
             { "data": "id" },
             { "data": "name" },
+            { "data": "doctorDegree" },
+            { "data": "doctorSpecialty" },
             { "data": "phoneNumber" },
-            { "data": "address", "width": "25%"},
-            { "data": "numberOfDoctors" },
             {
                 "data": "id",
                 "render": function (data) {
-                    return `<div class="text-center">                  
-                        <a href="/Hospitals/Details?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
+                    return `<div class="text-center">
+                        <a href="/Doctors/Details?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
                             <i class="fa fa-book"></i>
                         </a>
                         &nbsp;
-                        <a href="/Hospitals/Index?id=${data}" class='btn btn-info text-white' style='cursor:pointer;'>
+                        <a href="/Doctors/Upsert?id=${data}" class='btn btn-info text-white' style='cursor:pointer;'>
                             <i class="fa fa-pencil-alt"></i>
                         </a>
                         &nbsp;
                         <a class='btn btn-danger text-white' style='cursor:pointer;'
-                            onclick=Delete('/Hospitals/DeleteHospitals?id=${data}')>
+                            onclick=Delete('/Doctors/DeleteDoctor?id=${data}')>
                             <i class="fa fa-times"></i>
                         </a>
                         </div>`;
-                }, "width": "20%"
+                }, "width": "11%"
             }
         ],
         "language": {
             "emptyTable": "no data found"
         },
-        "width": "100%"
+        "width": "100%",
+        initComplete: function () {
+            this.api().columns().every(function () {
+                var that = this;
+                $('#' + $(this.footer()).text()).on('keyup change clear', function () {
+                    if (that.search() !== this.value.trim()) {
+                        that
+                            .search(this.value.trim())
+                            .draw();
+                    }
+                });
+            });
+        },
     });
 }
 

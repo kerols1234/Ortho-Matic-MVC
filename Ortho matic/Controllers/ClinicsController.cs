@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ortho_matic.Data;
 using Ortho_matic.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ortho_matic.Controllers
 {
@@ -19,13 +16,16 @@ namespace Ortho_matic.Controllers
             _context = context;
         }
 
-        // GET: Clinics
-        public async Task<IActionResult> Index()
+        public IActionResult Index(int? id)
         {
-            return View(await _context.Clinics.ToListAsync());
+            Clinic clinic = new Clinic() { Address = "" };
+            if (id != null)
+            {
+                clinic = _context.Clinics.FirstOrDefault(obj => obj.Id == id);
+            }
+            return View(clinic);
         }
 
-        // GET: Clinics/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,7 +33,7 @@ namespace Ortho_matic.Controllers
                 return NotFound();
             }
 
-            var clinic = await _context.Clinics
+            var clinic = await _context.Clinics.Include(obj => obj.DoctorClinics)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (clinic == null)
             {
@@ -43,111 +43,52 @@ namespace Ortho_matic.Controllers
             return View(clinic);
         }
 
-        // GET: Clinics/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Clinics/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Address,Latitude,Longitude")] Clinic clinic)
+        public IActionResult Upsert(Clinic model)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(clinic);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (model.Id != 0)
+                {
+                    _context.Clinics.Update(model);
+                }
+                else
+                {
+                    _context.Clinics.Add(model);
+                }
+                _context.SaveChanges();
+                return Redirect(nameof(Index));
             }
-            return View(clinic);
+            return View(model);
         }
 
-        // GET: Clinics/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public async Task<IActionResult> GetAllClinics()
         {
-            if (id == null)
+            return Json(new
             {
-                return NotFound();
-            }
+                data = await _context.Clinics.Include(obj => obj.DoctorClinics).Select(obj => new
+                {
+                    Id = obj.Id,
+                    PhoneNumber = obj.PhoneNumber,
+                    Address = obj.Address,
+                    NumberOfDoctors = obj.DoctorClinics.Count()
+                }).ToListAsync()
+            });
+        }
 
-            var clinic = await _context.Clinics.FindAsync(id);
+        [HttpDelete]
+        public async Task<IActionResult> DeleteClinics(int id)
+        {
+            var clinic = await _context.Clinics.FirstOrDefaultAsync(obj => obj.Id == id);
             if (clinic == null)
             {
-                return NotFound();
+                return Json(new { success = false, message = "Error while deleting" });
             }
-            return View(clinic);
-        }
-
-        // POST: Clinics/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Address,Latitude,Longitude")] Clinic clinic)
-        {
-            if (id != clinic.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(clinic);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ClinicExists(clinic.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(clinic);
-        }
-
-        // GET: Clinics/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var clinic = await _context.Clinics
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (clinic == null)
-            {
-                return NotFound();
-            }
-
-            return View(clinic);
-        }
-
-        // POST: Clinics/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var clinic = await _context.Clinics.FindAsync(id);
             _context.Clinics.Remove(clinic);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ClinicExists(int id)
-        {
-            return _context.Clinics.Any(e => e.Id == id);
+            _context.SaveChanges();
+            return Json(new { success = true, message = "Delete successfull" });
         }
     }
 }
