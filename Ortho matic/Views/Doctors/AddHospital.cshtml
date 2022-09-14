@@ -1,0 +1,227 @@
+﻿@model List<SelectListItem>
+
+@{
+    var DaySelectList = Enum.GetNames(typeof(DayOfWeekInArabic)).Select((i, c) => new SelectListItem
+            {
+                Text = i,
+                Value = c.ToString(),
+            }).AsQueryable();
+}
+
+<div class="row">
+    <div class="col-12 card custom-card">
+        <div class="row">
+            <h1 class="col-12">Hospitals</h1>
+        </div>
+        <div class="row">
+            <div class="form-group col-12">
+                <label for="Hospital" class="control-label">Hospital</label>
+                <select id="Hospital" asp-items="@Model" class="form-control"></select>
+            </div>
+
+            <h2 class="col-12">Best time</h2>
+
+            <div class="form-group col-3">
+                <label for="startDayBestHospital" class="control-label">startDay</label>
+                <select id="startDayBestHospital" asp-items="@DaySelectList" class="form-control"></select>
+            </div>
+            <div class="form-group col-3">
+                <label for="endDayBestHospital" class="control-label">endDay</label>
+                <select id="endDayBestHospital" asp-items="@DaySelectList" class="form-control"></select>
+            </div>
+            <div class="form-group col-3">
+                <label for="startTimeBestHospital" class="control-label">startTime</label>
+                <input id="startTimeBestHospital" name="startTime" type="time" class="form-control" />
+            </div>
+            <div class="form-group col-3">
+                <label for="endTimeBestHospital" class="control-label">endTime</label>
+                <input id="endTimeBestHospital" name="endTime" type="time" class="form-control" />
+            </div>
+
+            <h2 class="col-12">Times</h2>
+
+            <div class="form-group col-3">
+                <label for="startDayHospital" class="control-label">startDay</label>
+                <select id="startDayHospital" asp-items="@DaySelectList" class="form-control"></select>
+            </div>
+            <div class="form-group col-3">
+                <label for="endDayHospital" class="control-label">endDay</label>
+                <select id="endDayHospital" asp-items="@DaySelectList" class="form-control"></select>
+            </div>
+            <div class="form-group col-2">
+                <label for="startTimeHospital" class="control-label">startTime</label>
+                <input id="startTimeHospital" name="startTime" type="time" class="form-control" />
+            </div>
+            <div class="form-group col-2">
+                <label for="endTimeHospital" class="control-label">endTime</label>
+                <input id="endTimeHospital" name="endTime" type="time" class="form-control" />
+            </div>
+            <div class="form-group col-2">
+                <label for="add_time_hospital" class="control-label">&nbsp;</label>
+                <button type="button" id="add_time_hospital" class="form-control btn btn-outline-info">Add</button>
+            </div>
+
+            <div class="form-group col-12">
+                <table class="table form-group col-12" id="t_times_hospital">
+                    <thead>
+                        <tr>
+                            <th scope="col" width="23%">startDay</th>
+                            <th scope="col" width="23%">endDay</th>
+                            <th scope="col" width="23%">startTime</th>
+                            <th scope="col" width="23%">endTime</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="offset-12 form-group mt-3 col-3">
+                <button type="submit" id="btnSave" class="btn btn-info mr-2">
+                    Create
+                </button>
+                <a asp-action="Details" class="btn btn-warning text-white">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+
+        $("body").on("click", "#add_time_hospital", function () {
+
+            var txtStartTime = $("#startTimeHospital");
+            var txtEndTime = $("#endTimeHospital");
+            var txtStartDay = $("#startDayHospital option:selected");
+            var txtEndDay = $("#endDayHospital option:selected");
+
+            if (txtEndTime.val() == "" || txtStartTime.val() == "") {
+                return;
+            }
+
+            var data = new Date("2011-04-11T" + txtStartTime.val() + ":00");
+            var ST = data.toLocaleString('en-GB', {
+                hour12: true,
+            }).split(",")[1].replace(":00 ", " ");
+
+
+            data = new Date("2011-04-11T" + txtEndTime.val() + ":00");
+            var ET = data.toLocaleString('en-GB', {
+                hour12: true,
+            }).split(",")[1].replace(":00 ", " ");
+
+            tTimes = $("#t_times_hospital tbody")[0];
+
+            var row = tTimes.insertRow(-1);
+
+            var cell = $(row.insertCell(-1));
+            cell.html(txtStartDay.val());
+
+            cell = $(row.insertCell(-1));
+            cell.html(txtEndDay.val());
+
+            cell = $(row.insertCell(-1));
+            cell.html(ST);
+
+            cell = $(row.insertCell(-1));
+            cell.html(ET);
+
+            cell = $(row.insertCell(-1));
+            var btnRemove = $("<input/>");
+
+            btnRemove.attr("type", "button");
+            btnRemove.attr("onclick", "Remove(this,'#t_times_hospital');");
+            btnRemove.attr("class", "btn btn-danger btn-sm")
+            btnRemove.val("x");
+            cell.append(btnRemove);
+
+            txtStartTime.val("");
+            txtEndTime.val("");
+        });
+
+        function Remove(button) {
+            var row = $(button).closest("TR");
+            var name = $("TD", row).eq(0).html();
+            if (confirm("Do you want to delete:" + name)) {
+                var table = $('#t_times_hospital')[0];
+                table.deleteRow(row[0].rowIndex);
+            }
+        };
+
+        function hospitalObject() {
+            var hospital = {};
+
+            if ($("#startTimeBestHospital").val() == "" || $("#endTimeBestHospital").val() == "") {
+                return null;
+            }
+
+            var data = new Date("2011-04-11T" + $("#startTimeBestHospital").val() + ":00");
+            var ST = data.toLocaleString('en-GB', {
+                hour12: true,
+            }).split(",")[1].replace(":00 ", " ");
+
+            data = new Date("2011-04-11T" + $("#endTimeBestHospital").val() + ":00");
+            var ET = data.toLocaleString('en-GB', {
+                hour12: true,
+            }).split(",")[1].replace(":00 ", " ");
+
+            hospital.DoctorId = @ViewData["id"];
+            hospital.HospitalId = parseInt($("#Hospital option:selected").val());
+            hospital.bestTimeForVisit = {};
+            hospital.bestTimeForVisit.startTime = ST.trim();
+            hospital.bestTimeForVisit.endTime = ET.trim();
+            hospital.bestTimeForVisit.startDay = parseInt($("#startDayBestHospital option:selected").val());
+            hospital.bestTimeForVisit.endDay = parseInt($("#endDayBestHospital option:selected").val());
+            hospital.times = [];
+
+
+            $("#t_times_hospital TBODY TR").each(function () {
+                var row = $(this);
+                var time = {};
+                time.startDay = parseInt(row.find("TD").eq(0).html());
+                time.endDay = parseInt(row.find("TD").eq(1).html());
+                time.startTime = row.find("TD").eq(2).html().trim();
+                time.endTime = row.find("TD").eq(3).html().trim();
+                hospital.times.push(time);
+            });
+
+
+
+            console.log(JSON.stringify(hospital));
+
+
+            return hospital;
+        }
+
+        $("body").on("click", "#btnSave", function () {
+
+            var hospital = hospitalObject();
+
+            if(hospital == null)
+                return;
+
+            $.ajax({
+                type: "POST",
+                url: "/Doctors/AddHospital",
+                data: JSON.stringify(hospital),
+                contentType: "application/json; charset=utf-8",
+                traditional: true,
+                dataType: "json",
+                success: function (data) {
+                    if (data.success) {
+                        toastr.success(data.message);
+                    }
+                    else {
+                        toastr.error(data.message);
+                    }
+                }
+            });
+        });
+    </script>
+    }

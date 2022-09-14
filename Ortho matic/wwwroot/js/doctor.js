@@ -35,7 +35,7 @@ function loadDataTable() {
                             <i class="fa fa-times"></i>
                         </a>
                         </div>`;
-                }, "width": "11%"
+                }, "width": "15%"
             }
         ],
         "language": {

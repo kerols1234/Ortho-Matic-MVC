@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Ortho_matic.Data;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ortho_matic.Controllers
 {
+    [EnableCors]
     public class DoctorsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -38,76 +40,106 @@ namespace Ortho_matic.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Upsert(int? id)
+        public ActionResult Create()
         {
-            var doctor = new Doctor();
-            if (id != null)
-            {
-                doctor = await _context.Doctors.Include(obj => obj.DoctorClinics).Include(obj => obj.DoctorHospitals).FirstOrDefaultAsync(obj => obj.Id == id);
-            }
-
-            return View(new AddDoctorVM()
-            {
-                Doctor = doctor,
-                DoctorDegreeSelectList = Enum.GetNames(typeof(Degree)).Select(i => new SelectListItem
-                {
-                    Text = i.ToString(),
-                    Value = i.ToString(),
-                }).AsQueryable(),
-                DoctorSpecialtySelectList = Enum.GetNames(typeof(Specialty)).Select(i => new SelectListItem
-                {
-                    Text = i.ToString(),
-                    Value = i.ToString(),
-                }).AsQueryable(),
-                ClinicSelectList = _context.Clinics.Select(i => new SelectListItem
-                {
-                    Text = i.Address.ToString(),
-                    Value = i.Id.ToString(),
-                }).AsQueryable(),
-                HospitsalSelectList = _context.Hospitals.Select(i => new SelectListItem
-                {
-                    Text = i.Name.ToString(),
-                    Value = i.Id.ToString(),
-                }).AsQueryable(),
-                DaySelectList = Enum.GetNames(typeof(DayOfWeekInArabic)).Select(i => new SelectListItem
-                {
-                    Text = i.ToString(),
-                    Value = i.ToString(),
-                }).AsQueryable()
-            });
+            return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(Doctor model)
+        public IActionResult Create(Doctor model)
         {
             if (ModelState.IsValid)
             {
-                if (model.Id != 0)
-                {
-                    if (!_context.Doctors.Any(obj => obj.Id == model.Id))
-                        return NotFound();
-
-                    _context.Doctors.Update(model);
-                }
-                else
-                {
-                    _context.Doctors.Add(model);
-                }
+                _context.Doctors.Add(model);
                 _context.SaveChanges();
-                return Redirect(nameof(Index));
+                return Redirect(nameof(Details));
             }
             return View(model);
         }
 
-        /* #region API Calls
-         [HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> Details(int id)
         {
-            return Json(new { data = await _db.employees.Include(c => c.Department).ToListAsync() });
+            if (id == 0)
+            {
+                return NotFound();
+            }
+
+            var dpctor = await _context.Doctors.Include(obj => obj.DoctorClinics).Include(obj => obj.DoctorHospitals)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (dpctor == null)
+            {
+                return NotFound(new AddDoctorVM()
+                {
+                    DoctorDegreeSelectList = Enum.GetNames(typeof(Degree)).Select(i => new SelectListItem
+                    {
+                        Text = i.ToString(),
+                        Value = i.ToString(),
+                    }).AsQueryable(),
+                    DoctorSpecialtySelectList = Enum.GetNames(typeof(Specialty)).Select(i => new SelectListItem
+                    {
+                        Text = i.ToString(),
+                        Value = i.ToString(),
+                    }).AsQueryable(),
+                    ClinicSelectList = _context.Clinics.Select(i => new SelectListItem
+                    {
+                        Text = i.Address.ToString(),
+                        Value = i.Id.ToString(),
+                    }).AsQueryable(),
+                    HospitsalSelectList = _context.Hospitals.Select(i => new SelectListItem
+                    {
+                        Text = i.Name.ToString(),
+                        Value = i.Id.ToString(),
+                    }).AsQueryable(),
+                    DaySelectList = Enum.GetNames(typeof(DayOfWeekInArabic)).Select(i => new SelectListItem
+                    {
+                        Text = i.ToString(),
+                        Value = i.ToString(),
+                    }).AsQueryable()
+                });
+            }
+
+            return View(dpctor);
         }
-        */
+
+        public IActionResult AddClinic(int id)
+        {
+            ViewData["id"] = id;
+            var ClinicSelectList = _context.Clinics.Select(i => new SelectListItem
+            {
+                Text = i.Address.ToString(),
+                Value = i.Id.ToString(),
+            }).ToList();
+            return View(ClinicSelectList);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddClinic([FromBody] DoctorClinic doctorClinic)
+        {
+            await _context.DoctorClinics.AddAsync(doctorClinic);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Details));
+        }
+
+        public IActionResult AddHospital(int id)
+        {
+            ViewData["id"] = id;
+            var HospitsalSelectList = _context.Hospitals.Select(i => new SelectListItem
+            {
+                Text = i.Name.ToString(),
+                Value = i.Id.ToString(),
+            }).ToList();
+            return View(HospitsalSelectList);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddHospital([FromBody] DoctorHospital doctorHospital)
+        {
+            await _context.DoctorHospitals.AddAsync(doctorHospital);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Details));
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllDoctors()
         {
@@ -123,87 +155,5 @@ namespace Ortho_matic.Controllers
                 }).ToListAsync()
             });
         }
-
-        /*[HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> GetById(int id)
-        {
-            if (ModelState.IsValid)
-            {
-                return Json(new { data = await _db.employees.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id) });
-            }
-            return Json(new { success = false, message = "Error while get data" });
-        }
-
-        [HttpPut]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult Update([FromBody] Employee model)
-        {
-            if (ModelState.IsValid)
-            {
-                var employee = _db.employees.FirstOrDefault(obj => obj.Id == model.Id);
-
-                if (employee == null)
-                {
-                    return Json(new { success = false, message = "Error while updating" });
-                }
-
-                employee.Insurance = model.Insurance;
-                employee.JobTitle = model.JobTitle;
-                employee.EnglishName = model.EnglishName;
-                employee.Email = model.Email;
-                employee.Code = model.Code;
-                employee.DepartmentId = model.DepartmentId;
-                employee.Department = model.Department;
-                employee.ArabicName = model.ArabicName;
-
-                _db.SaveChanges();
-
-                return Json(new { success = true, message = "update successfull" });
-            }
-            return Json(new { success = false, message = "Error while updating" });
-        }
-
-        [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult Insert([FromBody] Employee model)
-        {
-            if (ModelState.IsValid && model.Id == 0)
-            {
-                _db.employees.Add(model);
-                _db.SaveChanges();
-                return Json(new { success = true, message = "insert successfull" });
-            }
-            return Json(new { success = false, message = "Error while adding" });
-        }
-
-        [HttpDelete]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var user = await _db.employees.FirstOrDefaultAsync(obj => obj.Id == id);
-            if (user == null)
-            {
-                return Json(new { success = false, message = "Error while deleting" });
-            }
-            _db.employees.Remove(user);
-            _db.SaveChanges();
-            return Json(new { success = true, message = "Delete successfull" });
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            var user = await _db.employees.FirstOrDefaultAsync(obj => obj.Id == id);
-            if (user == null)
-            {
-                return Json(new { success = false, message = "Error while deleting" });
-            }
-            _db.employees.Remove(user);
-            _db.SaveChanges();
-            return Json(new { success = true, message = "Delete successfull" });
-        }
-
-        #endregion*/
     }
 }

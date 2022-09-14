@@ -12,6 +12,7 @@ using Ortho_matic.Models;
 using System;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Ortho_matic
 {
@@ -53,7 +54,7 @@ namespace Ortho_matic
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                 };
             });
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddJsonOptions(o => o.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString); ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,5 +1,3 @@
-using System;
-
 namespace Ortho_matic.Models
 {
     public class ErrorViewModel
