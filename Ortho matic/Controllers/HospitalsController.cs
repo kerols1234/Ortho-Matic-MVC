@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ortho_matic.Data;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ortho_matic.Controllers
 {
+    [Authorize]
     [EnableCors]
     public class HospitalsController : Controller
     {

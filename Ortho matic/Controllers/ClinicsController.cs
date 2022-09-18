@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ortho_matic.Data;
 using Ortho_matic.Models;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ortho_matic.Controllers
 {
+    [Authorize]
     public class ClinicsController : Controller
     {
         private readonly ApplicationDbContext _context;

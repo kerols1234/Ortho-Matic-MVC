@@ -37,7 +37,6 @@ namespace Ortho_matic
                     .AllowAnyHeader()
                     );
             });
-            // services.AddTransient<SampleData>();
             services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -113,7 +112,7 @@ namespace Ortho_matic
                     {
                         Email = "admin@admin.com",
                         EmployeeName = "admin",
-                        UserName = "admin@admin.com",
+                        UserName = "admin",
                     };
                     var r = userManager.CreateAsync(user, "123456kE@").Result;
                     var e = userManager.AddToRoleAsync(user, "Admin").Result;

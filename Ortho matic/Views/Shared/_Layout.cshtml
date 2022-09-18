@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -15,49 +18,62 @@
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
 <body style="margin:0">
-
-    <div class="container-fluid">
-        <div class="row">
-            <aside class="col-2 p-3 pb-5">
-                <div class="top">
-                    <div class="logo">
-
-                        <img src="~/img/logo-03.png" />
-                    </div>
-                    <div class="close" id="close-btn">
-                        <span class="material-icons-sharp">close</span>
-                    </div>
-                </div>
-
-                <div class="sidebar">
-                    <a asp-controller="Home" asp-action="Index">
-                        <span class="material-icons-sharp"> grid_view</span>
-                        <h3>Home</h3>
-                    </a>
-                    <a asp-controller="Doctors" asp-action="Index">
-                        <span class="material-icons-sharp">person_outline</span>
-                        <h3>Doctors</h3>
-                    </a>
-                    <a asp-controller="Hospitals" asp-action="Index">
-                        <span class="material-icons-sharp">receipt_long</span>
-                        <h3>Hospitals</h3>
-                    </a>
-                    <a asp-controller="Clinics" asp-action="Index">
-                        <span class="material-icons-sharp">insights</span>
-                        <h3>Clinics</h3>
-                    </a>
-                    <a  asp-controller="Account" asp-action="LogOff">
-                        <span class="material-icons-sharp">logout</span>
-                        <h3>Logout</h3>
-                    </a>
-                </div>
-            </aside>
-            <main role="main" class="col-10 mt-0 p-3 container">
-                    @RenderBody()
-            </main>
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <div class="container-fluid bg-light d-flex" style="min-height:70vh;">
+            <div class="row col">
+                @RenderBody()
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="container-fluid">
+            <div class="row">
+                <aside class="col-2 p-3 pb-5">
+                    <div class="top">
+                        <div class="logo">
 
+                            <img src="~/img/logo-03.png" />
+                        </div>
+                        <div class="close" id="close-btn">
+                            <span class="material-icons-sharp">close</span>
+                        </div>
+                    </div>
+
+                    <div class="sidebar">
+                        <a asp-controller="Home" asp-action="Index">
+                            <span class="material-icons-sharp"> grid_view</span>
+                            <h3>Home</h3>
+                        </a>
+                        <a asp-controller="Doctors" asp-action="Index">
+                            <span class="material-icons-sharp">person_outline</span>
+                            <h3>Doctors</h3>
+                        </a>
+                        <a asp-controller="Hospitals" asp-action="Index">
+                            <span class="material-icons-sharp">receipt_long</span>
+                            <h3>Hospitals</h3>
+                        </a>
+                        <a asp-controller="Clinics" asp-action="Index">
+                            <span class="material-icons-sharp">insights</span>
+                            <h3>Clinics</h3>
+                        </a>
+                        <a asp-controller="Account" asp-action="Index">
+                            <span class="material-icons-sharp">insights</span>
+                            <h3>Users</h3>
+                        </a>
+                        <a asp-controller="Account" asp-action="LogOff">
+                            <span class="material-icons-sharp">logout</span>
+                            <h3>Logout</h3>
+                        </a>
+                    </div>
+                </aside>
+                <main role="main" class="col-10 mt-0 p-3 container">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    }
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/font-awesome/js/all.min.js"></script>

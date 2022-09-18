@@ -80,7 +80,7 @@
                 <button type="submit" id="btnSave" class="btn btn-info mr-2">
                     Create
                 </button>
-                <a asp-action="Details" class="btn btn-warning text-white">Cancel</a>
+                <a asp-action="Details" asp-route-id="@ViewData["id"]" class="btn btn-warning text-white">Cancel</a>
             </div>
         </div>
     </div>
@@ -207,15 +207,9 @@
                 url: "/Doctors/AddClinic",
                 data: JSON.stringify(clinic),
                 contentType: "application/json; charset=utf-8",
-                traditional: true,
-                dataType: "json",
+                dataType: "html",
                 success: function (data) {
-                    if (data.success) {
-                        toastr.success(data.message);
-                    }
-                    else {
-                        toastr.error(data.message);
-                    }
+                    window.location.href = '/Doctors/Details/@ViewData["id"]'
                 }
             });
         });

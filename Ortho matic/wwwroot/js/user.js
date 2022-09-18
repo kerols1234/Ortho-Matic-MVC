@@ -7,49 +7,38 @@ $(document).ready(function () {
 function loadDataTable() {
     dataTable = $('#DT_load').DataTable({
         "ajax": {
-            "url": "/Doctors/GetAllDoctors/",
+            "url": "/Account/GetAllUsers/",
             "type": "GET",
             "datatype": "json"
         },
-        "dom": "tr",
+        "search": {
+            "smart": true
+        },
         "columns": [
-            { "data": "id" },
-            { "data": "name" },
-            { "data": "doctorDegree" },
-            { "data": "doctorSpecialty" },
-            { "data": "phoneNumber" },
+            { "data": "name", "width": "20%" },
+            { "data": "employeeName", "width": "20%" },
+            { "data": "phoneNumber", "width": "20%" },
+            { "data": "email", "width": "20%" },
             {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">
-                        <a href="/Doctors/Details?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
-                            <i class="fa fa-book"></i>
+                        <a href="/Account/Upsert?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
+                            Edit
                         </a>
                         &nbsp;
                         <a class='btn btn-danger text-white' style='cursor:pointer;'
-                            onclick=Delete('/Doctors/DeleteDoctor?id=${data}')>
-                            <i class="fa fa-times"></i>
+                            onclick=Delete('/Account/DeleteUser?id=${data}')>
+                            Delete
                         </a>
                         </div>`;
-                }, "width": "15%"
+                }, "width": "20%"
             }
         ],
         "language": {
             "emptyTable": "no data found"
         },
-        "width": "100%",
-        initComplete: function () {
-            this.api().columns().every(function () {
-                var that = this;
-                $('#' + $(this.footer()).text()).on('keyup change clear', function () {
-                    if (that.search() !== this.value.trim()) {
-                        that
-                            .search(this.value.trim())
-                            .draw();
-                    }
-                });
-            });
-        },
+        "width": "100%"
     });
 }
 
