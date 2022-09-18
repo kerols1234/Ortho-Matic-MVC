@@ -10,8 +10,8 @@ using Ortho_matic.Data;
 namespace Ortho_matic.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220911160949_alterTableDoctor")]
-    partial class alterTableDoctor
+    [Migration("20220918141105_createTables")]
+    partial class createTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -384,7 +384,7 @@ namespace Ortho_matic.Migrations
 
                     b.HasIndex("DoctorHospitalHospitalId", "DoctorHospitalDoctorId");
 
-                    b.ToTable("Time");
+                    b.ToTable("Times");
                 });
 
             modelBuilder.Entity("Ortho_matic.Models.ApplicationUser", b =>

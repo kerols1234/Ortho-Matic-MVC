@@ -166,5 +166,66 @@ namespace Ortho_matic.Controllers
                 }).ToListAsync()
             });
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDoctor(int id)
+        {
+            var doctor = await _context.Doctors.FirstOrDefaultAsync(obj => obj.Id == id);
+            if (doctor == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            _context.Doctors.Remove(doctor);
+            _context.SaveChanges();
+            return Json(new { success = true, message = "Delete successfull" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDoctorClinic(int idD, int idC)
+        {
+            try
+            {
+                var doctorClinic = await _context.DoctorClinics.Include(obj => obj.BestTimeForVisit).Include(obj => obj.Times).FirstOrDefaultAsync(obj => obj.ClinicId == idC && obj.DoctorId == idD);
+                if (doctorClinic == null)
+                {
+                    return Json(new { success = false, message = "Error while deleting" });
+                }
+                _context.Times.Remove(doctorClinic.BestTimeForVisit);
+                _context.Times.RemoveRange(doctorClinic.Times);
+                _context.DoctorClinics.Remove(doctorClinic);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Delete successfull" });
+            }
+            catch (Exception e)
+            {
+                var s = e.Message;
+                return Json(new { success = true, message = e });
+            }
+
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDoctorHospital(int idD, int idH)
+        {
+            var doctorHospital = await _context.DoctorHospitals.Include(obj => obj.BestTimeForVisit).Include(obj => obj.Times).FirstOrDefaultAsync(obj => obj.HospitalId == idH && obj.DoctorId == idD);
+            if (doctorHospital == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            _context.Times.Remove(doctorHospital.BestTimeForVisit);
+            _context.Times.RemoveRange(doctorHospital.Times);
+            _context.DoctorHospitals.Remove(doctorHospital);
+            _context.SaveChanges();
+            return Json(new { success = true, message = "Delete successfull" });
+        }
+        public IActionResult DetailsClinic(int id)
+        {
+            var model = _context.DoctorClinics
+                .Include(obj => obj.BestTimeForVisit)
+                .Include(obj => obj.Times)
+                .ToList();
+            return View();
+        }
+
     }
 }

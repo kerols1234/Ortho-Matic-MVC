@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Ortho_matic.Migrations
 {
-    public partial class createDatabaseWithDoctorClinicHospitalTables : Migration
+    public partial class createTables : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -55,6 +55,7 @@ namespace Ortho_matic.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     Latitude = table.Column<double>(type: "float", nullable: true),
                     Longitude = table.Column<double>(type: "float", nullable: true)
                 },
@@ -70,7 +71,7 @@ namespace Ortho_matic.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Specialty = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DoctorSpecialty = table.Column<int>(type: "int", nullable: false),
                     DoctorDegree = table.Column<int>(type: "int", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true)
                 },
@@ -87,6 +88,7 @@ namespace Ortho_matic.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
                     Latitude = table.Column<double>(type: "float", nullable: true),
                     Longitude = table.Column<double>(type: "float", nullable: true)
                 },
@@ -227,7 +229,7 @@ namespace Ortho_matic.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Time",
+                name: "Times",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -243,9 +245,9 @@ namespace Ortho_matic.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Time", x => x.Id);
+                    table.PrimaryKey("PK_Times", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Time_DoctorClinics_DoctorClinicClinicId_DoctorClinicDoctorId",
+                        name: "FK_Times_DoctorClinics_DoctorClinicClinicId_DoctorClinicDoctorId",
                         columns: x => new { x.DoctorClinicClinicId, x.DoctorClinicDoctorId },
                         principalTable: "DoctorClinics",
                         principalColumns: new[] { "ClinicId", "DoctorId" },
@@ -276,9 +278,9 @@ namespace Ortho_matic.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DoctorHospitals_Time_BestTimeForVisitId",
+                        name: "FK_DoctorHospitals_Times_BestTimeForVisitId",
                         column: x => x.BestTimeForVisitId,
-                        principalTable: "Time",
+                        principalTable: "Times",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -343,26 +345,26 @@ namespace Ortho_matic.Migrations
                 column: "DoctorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Time_DoctorClinicClinicId_DoctorClinicDoctorId",
-                table: "Time",
+                name: "IX_Times_DoctorClinicClinicId_DoctorClinicDoctorId",
+                table: "Times",
                 columns: new[] { "DoctorClinicClinicId", "DoctorClinicDoctorId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Time_DoctorHospitalHospitalId_DoctorHospitalDoctorId",
-                table: "Time",
+                name: "IX_Times_DoctorHospitalHospitalId_DoctorHospitalDoctorId",
+                table: "Times",
                 columns: new[] { "DoctorHospitalHospitalId", "DoctorHospitalDoctorId" });
 
             migrationBuilder.AddForeignKey(
-                name: "FK_DoctorClinics_Time_BestTimeForVisitId",
+                name: "FK_DoctorClinics_Times_BestTimeForVisitId",
                 table: "DoctorClinics",
                 column: "BestTimeForVisitId",
-                principalTable: "Time",
+                principalTable: "Times",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Time_DoctorHospitals_DoctorHospitalHospitalId_DoctorHospitalDoctorId",
-                table: "Time",
+                name: "FK_Times_DoctorHospitals_DoctorHospitalHospitalId_DoctorHospitalDoctorId",
+                table: "Times",
                 columns: new[] { "DoctorHospitalHospitalId", "DoctorHospitalDoctorId" },
                 principalTable: "DoctorHospitals",
                 principalColumns: new[] { "HospitalId", "DoctorId" },
@@ -384,11 +386,11 @@ namespace Ortho_matic.Migrations
                 table: "DoctorHospitals");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_DoctorClinics_Time_BestTimeForVisitId",
+                name: "FK_DoctorClinics_Times_BestTimeForVisitId",
                 table: "DoctorClinics");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_DoctorHospitals_Time_BestTimeForVisitId",
+                name: "FK_DoctorHospitals_Times_BestTimeForVisitId",
                 table: "DoctorHospitals");
 
             migrationBuilder.DropTable(
@@ -419,7 +421,7 @@ namespace Ortho_matic.Migrations
                 name: "Doctors");
 
             migrationBuilder.DropTable(
-                name: "Time");
+                name: "Times");
 
             migrationBuilder.DropTable(
                 name: "DoctorClinics");

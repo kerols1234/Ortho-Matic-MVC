@@ -382,7 +382,7 @@ namespace Ortho_matic.Migrations
 
                     b.HasIndex("DoctorHospitalHospitalId", "DoctorHospitalDoctorId");
 
-                    b.ToTable("Time");
+                    b.ToTable("Times");
                 });
 
             modelBuilder.Entity("Ortho_matic.Models.ApplicationUser", b =>
