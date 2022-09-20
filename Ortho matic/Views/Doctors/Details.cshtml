@@ -75,7 +75,7 @@
                     <tbody>
                         @foreach (var item in Model.DoctorClinics)
                         {
-                            <tr>
+                            <tr >
                                 <th>@item.Clinic.Address</th>
                                 <th>@item.Clinic.PhoneNumber</th>
                                 <th>@item.BestTimeForVisit.StartDay</th>
@@ -84,8 +84,12 @@
                                 <th>@item.BestTimeForVisit.EndTime</th>
                                 <th>
                                     <div class="text-center">
+                                        <a href="/Doctors/DetailsClinic?idD=@item.DoctorId&idC=@item.ClinicId" class='btn btn-success text-white' style='cursor:pointer;'>
+                                            <i class="fa fa-book"></i>
+                                        </a>
+                                        &nbsp;
                                         <a class='btn btn-danger text-white' style='cursor:pointer;'
-                                       onclick='Delete("/Doctors/DeleteDoctorClinic?idD=@item.DoctorId&idC=@item.ClinicId",this,"doctor_clinic")'>
+                                        onclick='Delete("/Doctors/DeleteDoctorClinic?idD=@item.DoctorId&idC=@item.ClinicId",this,"doctor_clinic")'>
                                             <i class="fa fa-times"></i>
                                         </a>
                                     </div>
@@ -131,8 +135,12 @@
                                 <th>@item.BestTimeForVisit.EndTime</th>
                                 <th>
                                     <div class="text-center">
+                                        <a href="/Doctors/DetailsHospital?idD=@item.DoctorId&idH=@item.HospitalId" class='btn btn-success text-white' style='cursor:pointer;'>
+                                            <i class="fa fa-book"></i>
+                                        </a>
+                                        &nbsp;
                                         <a class='btn btn-danger text-white' style='cursor:pointer;'
-                                       onclick='Delete("/Doctors/DeleteDoctorHospital?idD=@item.DoctorId&idH=@item.HospitalId",this,"doctor_hospital")'>
+                                       onclick='Delete("/Doctors/DeleteDoctorHospital?idD=@item.DoctorId&idH=@item.HospitalId",this,"doctor_cospital")'>
                                             <i class="fa fa-times"></i>
                                         </a>
                                     </div>
@@ -190,7 +198,7 @@
             });
         }
 
-        function Delete(url, button,table_name) {
+        function Delete(url, button, table_name) {
             swal({
                 title: "Are you sure?",
                 text: "Once deleted, you will not be able to recover",

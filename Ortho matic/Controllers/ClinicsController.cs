@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ortho_matic.Data;
 using Ortho_matic.Models;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -83,14 +84,26 @@ namespace Ortho_matic.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteClinics(int id)
         {
-            var clinic = await _context.Clinics.FirstOrDefaultAsync(obj => obj.Id == id);
-            if (clinic == null)
+            try
             {
-                return Json(new { success = false, message = "Error while deleting" });
+                var clinic = await _context.Clinics.FirstOrDefaultAsync(obj => obj.Id == id);
+                if (clinic == null)
+                {
+                    return Json(new { success = false, message = "Error while deleting" });
+                }
+                var doctorClinic = _context.DoctorClinics.Include(obj => obj.BestTimeForVisit).Include(obj => obj.Times).Where(obj => obj.ClinicId == id);
+                _context.Times.RemoveRange(doctorClinic.Select(obj => obj.BestTimeForVisit));
+                _context.Times.RemoveRange(doctorClinic.SelectMany(obj => obj.Times));
+                _context.DoctorClinics.RemoveRange(doctorClinic);
+                _context.Clinics.Remove(clinic);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Delete successfull" });
             }
-            _context.Clinics.Remove(clinic);
-            _context.SaveChanges();
-            return Json(new { success = true, message = "Delete successfull" });
+            catch (Exception e)
+            {
+                return Json(new { success = false, message = e.Message });
+            }
+
         }
     }
 }

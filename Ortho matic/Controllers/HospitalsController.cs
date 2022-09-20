@@ -91,6 +91,10 @@ namespace Ortho_matic.Controllers
             {
                 return Json(new { success = false, message = "Error while deleting" });
             }
+            var doctorHospital = _context.DoctorHospitals.Include(obj => obj.BestTimeForVisit).Include(obj => obj.Times).Where(obj => obj.HospitalId == id);
+            _context.Times.RemoveRange(doctorHospital.Select(obj => obj.BestTimeForVisit));
+            _context.Times.RemoveRange(doctorHospital.SelectMany(obj => obj.Times));
+            _context.DoctorHospitals.RemoveRange(doctorHospital);
             _context.Hospitals.Remove(hos);
             _context.SaveChanges();
             return Json(new { success = true, message = "Delete successfull" });

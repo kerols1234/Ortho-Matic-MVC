@@ -218,13 +218,83 @@ namespace Ortho_matic.Controllers
             _context.SaveChanges();
             return Json(new { success = true, message = "Delete successfull" });
         }
-        public IActionResult DetailsClinic(int id)
+
+        [HttpGet]
+        public IActionResult DetailsClinic(int idD, int idC)
         {
             var model = _context.DoctorClinics
+                .Include(obj => obj.Clinic)
                 .Include(obj => obj.BestTimeForVisit)
                 .Include(obj => obj.Times)
-                .ToList();
-            return View();
+                .FirstOrDefault(obj => obj.ClinicId == idC && obj.DoctorId == idD);
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditClinic([FromBody] DoctorClinic doctorClinic)
+        {
+            try
+            {
+                var oldDoctorClinic = _context.DoctorClinics
+                    .Include(obj => obj.BestTimeForVisit)
+                    .Include(obj => obj.Times)
+                    .AsNoTracking()
+                    .FirstOrDefault(obj => obj.ClinicId == doctorClinic.ClinicId && obj.DoctorId == doctorClinic.DoctorId);
+
+                _context.Times.RemoveRange(oldDoctorClinic.Times.Except(doctorClinic.Times));
+
+                oldDoctorClinic.Times = doctorClinic.Times;
+                oldDoctorClinic.BestTimeForVisit = doctorClinic.BestTimeForVisit;
+
+                // _context.Entry(doctorClinic).State = EntityState.Detached;
+                //_context.Entry(doctorClinic.Times).State = EntityState.Detached;
+                //_context.Entry(doctorClinic.BestTimeForVisit).State = EntityState.Detached;
+
+                _context.DoctorClinics.Update(oldDoctorClinic);
+                var re = _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return RedirectToAction(nameof(Details), new { id = doctorClinic.DoctorId });
+        }
+
+        [HttpGet]
+        public IActionResult DetailsHospital(int idD, int idH)
+        {
+            var model = _context.DoctorHospitals
+                .Include(obj => obj.Hospital)
+                .Include(obj => obj.BestTimeForVisit)
+                .Include(obj => obj.Times)
+                .FirstOrDefault(obj => obj.HospitalId == idH && obj.DoctorId == idD);
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditHospital([FromBody] DoctorHospital doctorHospital)
+        {
+            try
+            {
+                var oldDoctorHospital = _context.DoctorHospitals
+                    .Include(obj => obj.BestTimeForVisit)
+                    .Include(obj => obj.Times)
+                    .AsNoTracking()
+                    .FirstOrDefault(obj => obj.HospitalId == doctorHospital.HospitalId && obj.DoctorId == doctorHospital.DoctorId);
+
+                _context.Times.RemoveRange(oldDoctorHospital.Times.Except(doctorHospital.Times));
+
+                oldDoctorHospital.Times = doctorHospital.Times;
+                oldDoctorHospital.BestTimeForVisit = doctorHospital.BestTimeForVisit;
+
+                _context.DoctorHospitals.Update(oldDoctorHospital);
+                var re = _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return RedirectToAction(nameof(Details), new { id = doctorHospital.DoctorId });
         }
 
     }

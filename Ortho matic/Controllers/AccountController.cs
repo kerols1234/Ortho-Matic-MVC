@@ -111,7 +111,6 @@ namespace Ortho_matic.Controllers
             return View(model);
         }
 
-
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Login()
