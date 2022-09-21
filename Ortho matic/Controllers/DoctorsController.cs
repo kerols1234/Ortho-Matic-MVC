@@ -170,14 +170,41 @@ namespace Ortho_matic.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteDoctor(int id)
         {
-            var doctor = await _context.Doctors.FirstOrDefaultAsync(obj => obj.Id == id);
-            if (doctor == null)
+            try
             {
-                return Json(new { success = false, message = "Error while deleting" });
+                var doctor = await _context.Doctors
+                    .Include(obj => obj.DoctorClinics)
+                    .ThenInclude(obj => obj.BestTimeForVisit)
+                    .Include(obj => obj.DoctorClinics)
+                    .ThenInclude(obj => obj.Times)
+                    .Include(obj => obj.DoctorHospitals)
+                    .ThenInclude(obj => obj.Times)
+                    .Include(obj => obj.DoctorHospitals)
+                    .ThenInclude(obj => obj.BestTimeForVisit)
+                    .FirstOrDefaultAsync(obj => obj.Id == id);
+
+                if (doctor == null)
+                {
+                    return Json(new { success = false, message = "Error while deleting" });
+                }
+
+                _context.Times.RemoveRange(doctor.DoctorClinics.Select(obj => obj.BestTimeForVisit));
+                _context.Times.RemoveRange(doctor.DoctorClinics.SelectMany(obj => obj.Times));
+                _context.Times.RemoveRange(doctor.DoctorHospitals.Select(obj => obj.BestTimeForVisit));
+                _context.Times.RemoveRange(doctor.DoctorHospitals.SelectMany(obj => obj.Times));
+
+                _context.DoctorHospitals.RemoveRange(doctor.DoctorHospitals);
+                _context.DoctorClinics.RemoveRange(doctor.DoctorClinics);
+
+                _context.Doctors.Remove(doctor);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Delete successfull" });
             }
-            _context.Doctors.Remove(doctor);
-            _context.SaveChanges();
-            return Json(new { success = true, message = "Delete successfull" });
+            catch (Exception e)
+            {
+                return Json(new { success = false, message = e.Message });
+            }
+
         }
 
         [HttpDelete]

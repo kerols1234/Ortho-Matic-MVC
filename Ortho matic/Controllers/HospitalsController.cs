@@ -32,13 +32,18 @@ namespace Ortho_matic.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (id == null || id == 0)
             {
                 return NotFound();
             }
 
-            var hospital = await _context.Hospitals.Include(obj => obj.DoctorHospitals)
+            var hospital = await _context.Hospitals
+                .Include(obj => obj.DoctorHospitals)
+                .ThenInclude(obj => obj.BestTimeForVisit)
+                .Include(obj => obj.DoctorHospitals)
+                .ThenInclude(obj => obj.Doctor)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (hospital == null)
             {
                 return NotFound();
@@ -49,22 +54,26 @@ namespace Ortho_matic.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(Hospital model)
+        public IActionResult insert(Hospital model)
         {
             if (ModelState.IsValid)
             {
-                if (model.Id != 0)
-                {
-                    _context.Hospitals.Update(model);
-                }
-                else
-                {
-                    _context.Hospitals.Add(model);
-                }
+                _context.Hospitals.Add(model);
                 _context.SaveChanges();
-                return Redirect(nameof(Index));
             }
-            return View(model);
+            return Redirect(nameof(Index));
+        }
+
+        [HttpPost]
+        public IActionResult Update([FromBody] Hospital model)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Hospitals.Update(model);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "update successfull" });
+            }
+            return Json(new { success = false, message = ModelState.Values });
         }
 
         [HttpGet]

@@ -36,7 +36,11 @@ namespace Ortho_matic.Controllers
                 return NotFound();
             }
 
-            var clinic = await _context.Clinics.Include(obj => obj.DoctorClinics)
+            var clinic = await _context.Clinics
+                .Include(obj => obj.DoctorClinics)
+                .ThenInclude(obj => obj.BestTimeForVisit)
+                .Include(obj => obj.DoctorClinics)
+                .ThenInclude(obj => obj.Doctor)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (clinic == null)
             {
@@ -48,22 +52,26 @@ namespace Ortho_matic.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(Clinic model)
+        public IActionResult insert(Clinic model)
         {
             if (ModelState.IsValid)
             {
-                if (model.Id != 0)
-                {
-                    _context.Clinics.Update(model);
-                }
-                else
-                {
-                    _context.Clinics.Add(model);
-                }
+                _context.Clinics.Add(model);
                 _context.SaveChanges();
-                return Redirect(nameof(Index));
             }
-            return View(model);
+            return Redirect(nameof(Index));
+        }
+
+        [HttpPost]
+        public IActionResult Update([FromBody] Clinic model)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Clinics.Update(model);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "update successfull" });
+            }
+            return Json(new { success = false, message = ModelState.Values });
         }
 
         [HttpGet]

@@ -24,10 +24,6 @@ function loadDataTable() {
                             <i class="fa fa-book"></i>
                         </a>
                         &nbsp;
-                        <a href="/Clinics/Index?id=${data}" class='btn btn-info text-white' style='cursor:pointer;'>
-                            <i class="fa fa-pencil-alt"></i>
-                        </a>
-                        &nbsp;
                         <a class='btn btn-danger text-white' style='cursor:pointer;'
                             onclick=Delete('/Clinics/DeleteClinics?id=${data}')>
                             <i class="fa fa-times"></i>
