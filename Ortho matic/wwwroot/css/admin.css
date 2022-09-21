@@ -620,3 +620,17 @@ main .recent-orders table{
        font-size:2rem;
    }
 }
+.big{
+    font-family: Manufaktur-Heavy;
+    font-weight: 900;
+    font-style: normal;
+    font-size:3rem;
+    color:#2900fa;
+    
+    
+}
+
+.display-4 {
+    font-family: Manufaktur-Heavy;
+}
+
