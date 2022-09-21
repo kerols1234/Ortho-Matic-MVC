@@ -624,18 +624,28 @@ main .recent-orders table{
     font-weight: 900;
     font-style: normal;
     font-size:3rem;
-    color:#2900fa;
+    color:white;
+
     
     
 }
 
 .display-4 {
     font-family: Manufaktur-Heavy;
+    color:white;
 }
 .ma {
     background-image: url('../img/WhatsApp Image 2022-09-21 at 9.26.39 AM.jpeg');
-    width:100%;
-    height:100vh;
+    width:auto;
+   
+    /* Set a specific height */
+    min-height: 500px;
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
    
 }
 
