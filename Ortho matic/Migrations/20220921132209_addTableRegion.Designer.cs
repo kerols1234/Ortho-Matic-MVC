@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ortho_matic.Data;
 
 namespace Ortho_matic.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220921132209_addTableRegion")]
+    partial class addTableRegion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,12 +245,7 @@ namespace Ortho_matic.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<int>("RegionId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("RegionId");
 
                     b.ToTable("Clinics");
                 });
@@ -344,12 +341,7 @@ namespace Ortho_matic.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<int>("RegionId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("RegionId");
 
                     b.ToTable("Hospitals");
                 });
@@ -477,17 +469,6 @@ namespace Ortho_matic.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Ortho_matic.Models.Clinic", b =>
-                {
-                    b.HasOne("Ortho_matic.Models.Region", "Region")
-                        .WithMany()
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Region");
-                });
-
             modelBuilder.Entity("Ortho_matic.Models.DoctorClinic", b =>
                 {
                     b.HasOne("Ortho_matic.Models.Time", "BestTimeForVisit")
@@ -536,17 +517,6 @@ namespace Ortho_matic.Migrations
                     b.Navigation("Doctor");
 
                     b.Navigation("Hospital");
-                });
-
-            modelBuilder.Entity("Ortho_matic.Models.Hospital", b =>
-                {
-                    b.HasOne("Ortho_matic.Models.Region", "Region")
-                        .WithMany()
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Region");
                 });
 
             modelBuilder.Entity("Ortho_matic.Models.Time", b =>

@@ -25,5 +25,6 @@ namespace Ortho_matic.Data
         public DbSet<Hospital> Hospitals { get; set; }
         public DbSet<Clinic> Clinics { get; set; }
         public DbSet<Time> Times { get; set; }
+        public DbSet<Region> Regions { get; set; }
     }
 }
