@@ -33,16 +33,15 @@
     --color-light:rgba(0,0,0,0.4);
     --box-shadow:0 2rem 3rem var(--color-light);
 }
-*{
-   margin: 0;
-   padding: 0;
-   outline: 0;
-   -moz-appearance: none;
-   border: 0;
-   text-decoration: none;
-   list-style: none;
-   box-sizing: border-box;
-
+* {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    -moz-appearance: none;
+    border: 0;
+    text-decoration: none;
+    list-style: none;
+    box-sizing: border-box;
 
 }
 html{
@@ -625,13 +624,29 @@ main .recent-orders table{
     font-weight: 900;
     font-style: normal;
     font-size:3rem;
-    color:#2900fa;
+    color:white;
+
     
     
 }
 
 .display-4 {
     font-family: Manufaktur-Heavy;
+    color:white;
+}
+.ma {
+    background-image: url('../img/WhatsApp Image 2022-09-21 at 9.26.39 AM.jpeg');
+    width:auto;
+   
+    /* Set a specific height */
+    min-height: 500px;
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+   
 }
 
 .testt {
