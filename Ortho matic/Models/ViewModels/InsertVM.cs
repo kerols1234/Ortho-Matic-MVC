@@ -2,7 +2,7 @@
 
 namespace Ortho_matic.Models.ViewModels
 {
-    public class UpsertVM
+    public class InsertVM
     {
         public string Id { get; set; }
 
@@ -32,5 +32,7 @@ namespace Ortho_matic.Models.ViewModels
         public string PhoneNumber { get; set; }
         [Display(Name = "Employee Name")]
         public string EmployeeName { get; set; }
+        public int? RegionId { get; set; }
+        public string Region { get; set; }
     }
 }

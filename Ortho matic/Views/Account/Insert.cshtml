@@ -1,31 +1,15 @@
 ﻿@model Ortho_matic.Models.ViewModels.InsertVM
 @{
-    
-    var pageName = "Create a new account";
-    var buttonName = "Create";
-    if (Model.Id != null)
-    {
-        pageName = "Edit account";
-        buttonName = "Update";
-    }
-    
-    var dis = false;
-    if(Model.Name == "admin")
-    {
-        dis = true;
-    }
-
     SelectList regionLst = new SelectList(ViewBag.Regions, "Id", "Name", Model.RegionId ?? -1);
 }
 <div class="col-12">
     <div class="card custom-card">
-        <h1 class="text-info card-header bg-white">@pageName</h1>
+        <h1 class="text-info card-header bg-white">Create a new account</h1>
         <div class="card-body">
-            <form asp-controller="Account" asp-action="Upsert" method="post" role="form">
+            <form asp-controller="Account" asp-action="Insert" method="post" role="form">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input asp-for="Id" class="form-control" hidden />
                 <div class="row">
-                    <div class="form-group col-6" hidden="@dis">
+                    <div class="form-group col-6">
                         <label asp-for="Name"></label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
@@ -47,11 +31,7 @@
                     </div>
                     <div class="form-group col-6">
                         <label asp-for="Region"></label>
-                        <select asp-for="RegionId" asp-items="regionLst" class="form-control">
-                            @if(Model.Id != null) {
-                                <option value="-1">no region selected</option>
-                            }
-                        </select>
+                        <select asp-for="RegionId" asp-items="regionLst" class="form-control"></select>
                         <span asp-validation-for="Region" class="text-danger"></span>
                     </div>
                     <div class="form-group col-6">
@@ -64,10 +44,10 @@
                         <input asp-for="ConfirmPassword" class="form-control" />
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
-                    </div>
+                </div>
                 <div class="form-group row">
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-outline-info form-control">@buttonName</button>
+                        <button type="submit" class="btn btn-outline-info form-control">Create</button>
                     </div>
                     <div class="col-md-2">
                         <a asp-action="Index" asp-controller="Account" class="btn btn-outline-warning form-control">Back</a>

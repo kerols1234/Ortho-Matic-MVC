@@ -35,26 +35,116 @@ namespace Ortho_matic.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Upsert(string id)
+        public async Task<IActionResult> Update(string id)
         {
-            UpsertVM registerViewModel = new UpsertVM();
-            if (id != null)
+            if (id == null)
             {
-                var user = await _db.ApplicationUsers.FirstOrDefaultAsync(obj => obj.Id == id);
-
-                registerViewModel.Id = user.Id;
-                registerViewModel.Name = user.UserName;
-                registerViewModel.Email = user.Email;
-                registerViewModel.EmployeeName = user.EmployeeName;
-                registerViewModel.PhoneNumber = user.PhoneNumber;
-
+                return NotFound();
             }
-            return View(registerViewModel);
+
+            var user = await _db.ApplicationUsers.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            UpdateVM model = new UpdateVM();
+            model.Id = user.Id;
+            model.Name = user.UserName;
+            model.Email = user.Email;
+            model.EmployeeName = user.EmployeeName;
+            model.PhoneNumber = user.PhoneNumber;
+            model.RegionId = user.RegionId;
+
+            ViewBag.Regions = _db.Regions.ToList();
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Upsert(UpsertVM model)
+        public async Task<IActionResult> Update(UpdateVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                IdentityResult result;
+
+                var oldUser = await _userManager.FindByIdAsync(model.Id) as ApplicationUser;
+
+                if (oldUser == null)
+                {
+                    ModelState.AddModelError(string.Empty, "This user doe not exist");
+                    RedirectToAction(nameof(Index));
+                }
+
+                if (await _userManager.IsInRoleAsync(oldUser, "Admin") && model.Name != "admin")
+                {
+                    ModelState.AddModelError(string.Empty, "can not change user name of admin");
+                    return View(model);
+                }
+
+                if (model.Password != null && model.Password.Trim() != "")
+                {
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(oldUser);
+                    result = await _userManager.ResetPasswordAsync(oldUser, code, model.Password);
+
+                    if (!result.Succeeded)
+                    {
+                        AddErrors(result);
+                    }
+                }
+
+                if (model.Email != null && model.Email.Trim() != "")
+                {
+                    oldUser.Email = model.Email;
+                }
+
+                if (model.Name != null && model.Name.Trim() != "")
+                {
+                    oldUser.UserName = model.Name;
+                }
+
+                if (model.PhoneNumber != null && model.PhoneNumber.Trim() != "")
+                {
+                    oldUser.PhoneNumber = model.PhoneNumber;
+                }
+
+                if (model.EmployeeName != null && model.EmployeeName.Trim() != "")
+                {
+                    oldUser.EmployeeName = model.EmployeeName;
+                }
+
+                if (model.RegionId != null)
+                {
+                    oldUser.RegionId = model.RegionId == -1 ? null : model.RegionId;
+                }
+
+                result = await _userManager.UpdateAsync(oldUser);
+
+                if (result.Succeeded)
+                {
+                    return Redirect(nameof(Index));
+                }
+                AddErrors(result);
+            }
+
+            ViewBag.Regions = _db.Regions.ToList();
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Insert()
+        {
+            ViewBag.Regions = _db.Regions.ToList();
+
+            return View(new InsertVM());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Insert(InsertVM model)
         {
             if (ModelState.IsValid)
             {
@@ -64,42 +154,10 @@ namespace Ortho_matic.Controllers
                     Email = model.Email,
                     EmployeeName = model.EmployeeName,
                     PhoneNumber = model.PhoneNumber,
+                    RegionId = model.RegionId
                 };
 
-                IdentityResult result;
-
-                if (model.Id != null && model.Id != "")
-                {
-                    var oldUser = await _userManager.FindByIdAsync(model.Id) as ApplicationUser;
-                    if (oldUser == null)
-                    {
-                        ModelState.AddModelError(string.Empty, "This user doe not exist");
-                        RedirectToAction(nameof(Index));
-                    }
-
-                    if (await _userManager.IsInRoleAsync(oldUser, "Admin") && model.Name != "admin")
-                    {
-                        ModelState.AddModelError(string.Empty, "can not change user name of admin");
-                        return View(model); ;
-                    }
-
-                    var code = await _userManager.GeneratePasswordResetTokenAsync(oldUser);
-                    result = await _userManager.ResetPasswordAsync(oldUser, code, model.Password);
-
-                    if (!result.Succeeded)
-                    {
-                        AddErrors(result);
-                    }
-                    oldUser.Email = model.Email;
-                    oldUser.UserName = model.Name;
-                    oldUser.PhoneNumber = model.PhoneNumber;
-                    oldUser.EmployeeName = model.EmployeeName;
-                    result = await _userManager.UpdateAsync(oldUser);
-                }
-                else
-                {
-                    result = await _userManager.CreateAsync(user, model.Password);
-                }
+                var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
@@ -107,6 +165,8 @@ namespace Ortho_matic.Controllers
                 }
                 AddErrors(result);
             }
+
+            ViewBag.Regions = _db.Regions.ToList();
 
             return View(model);
         }
@@ -166,13 +226,14 @@ namespace Ortho_matic.Controllers
         {
             return Json(new
             {
-                data = await _db.ApplicationUsers.Select(obj => new UpsertVM()
+                data = await _db.ApplicationUsers.Select(obj => new InsertVM()
                 {
                     Id = obj.Id,
                     Email = obj.Email,
                     EmployeeName = obj.EmployeeName,
                     Name = obj.UserName,
-                    PhoneNumber = obj.PhoneNumber
+                    PhoneNumber = obj.PhoneNumber,
+                    Region = obj.Region != null ? obj.Region.Name : "no region selected",
                 }).ToListAsync()
             });
         }

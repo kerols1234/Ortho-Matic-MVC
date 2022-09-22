@@ -83,10 +83,12 @@ namespace Ortho_matic.Controllers
             var doctor = await _context.Doctors
                 .Include(obj => obj.DoctorClinics)
                 .ThenInclude(obj => obj.Clinic)
+                .ThenInclude(obj => obj.Region)
                 .Include(obj => obj.DoctorClinics)
                 .ThenInclude(obj => obj.BestTimeForVisit)
                 .Include(obj => obj.DoctorHospitals)
                 .ThenInclude(obj => obj.Hospital)
+                .ThenInclude(obj => obj.Region)
                 .Include(obj => obj.DoctorHospitals)
                 .ThenInclude(obj => obj.BestTimeForVisit)
                 .FirstOrDefaultAsync(m => m.Id == id);

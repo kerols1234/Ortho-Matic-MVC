@@ -15,15 +15,16 @@ function loadDataTable() {
             "smart": true
         },
         "columns": [
-            { "data": "name", "width": "20%" },
-            { "data": "employeeName", "width": "20%" },
-            { "data": "phoneNumber", "width": "20%" },
-            { "data": "email", "width": "20%" },
+            { "data": "name", "width": "15%" },
+            { "data": "employeeName", "width": "15%" },
+            { "data": "region", "width": "15%" },
+            { "data": "phoneNumber", "width": "15%" },
+            { "data": "email", "width": "15%" },
             {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">
-                        <a href="/Account/Upsert?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
+                        <a href="/Account/Update?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
                             Edit
                         </a>
                         &nbsp;
@@ -32,7 +33,7 @@ function loadDataTable() {
                             Delete
                         </a>
                         </div>`;
-                }, "width": "20%"
+                }, "width": "25%"
             }
         ],
         "language": {

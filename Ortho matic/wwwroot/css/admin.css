@@ -122,8 +122,6 @@ b{
      display:flex;
      align-items:center;
      justify-content: space-between;
-     margin-top: 1.4rem;
-
  }
  aside .logo{
      display:flex;
@@ -147,7 +145,7 @@ aside .sidebar {
     flex-direction: column;
     height: 86vh;
     position: relative;
-    top: 3rem;
+    top: 1.5rem;
     
 
 

@@ -67,6 +67,7 @@
                     <table class="table" id="doctor_clinic">
                         <thead>
                             <tr>
+                                <th scope="col">Region</th>
                                 <th scope="col">Address</th>
                                 <th scope="col">PhoneNumber</th>
                                 <th scope="col">StartDay</th>
@@ -80,6 +81,7 @@
                             @foreach (var item in Model.DoctorClinics)
                             {
                                 <tr>
+                                    <th>@item.Clinic.Region.Name</th>
                                     <th>@item.Clinic.Address</th>
                                     <th>@item.Clinic.PhoneNumber</th>
                                     <th>@item.BestTimeForVisit.StartDay</th>
@@ -119,6 +121,7 @@
                     <table class="table" id="doctor_hospital">
                         <thead>
                             <tr>
+                                <th scope="col">Region</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Address</th>
                                 <th scope="col">PhoneNumber</th>
@@ -133,6 +136,7 @@
                             @foreach (var item in Model.DoctorHospitals)
                             {
                                 <tr>
+                                    <th>@item.Hospital.Region.Name</th>
                                     <th>@item.Hospital.Name</th>
                                     <th>@item.Hospital.Address</th>
                                     <th>@item.Hospital.PhoneNumber</th>
