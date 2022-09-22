@@ -13,9 +13,10 @@ function loadDataTable() {
         },
         "columns": [
             { "data": "id" },
+            { "data": "region" },
             { "data": "phoneNumber" },
-            { "data": "address", "width": "30%"},
-            { "data": "numberOfDoctors"},
+            { "data": "address", "width": "30%" },
+            { "data": "numberOfDoctors" },
             {
                 "data": "id",
                 "render": function (data) {

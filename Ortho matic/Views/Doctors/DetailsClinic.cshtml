@@ -14,95 +14,97 @@
 }
 
 <div class="row" style="width:100%">
-    <div class="col-12 card custom-card">
-        <div class="row">
-            <h1 class="col-12">Clinics</h1>
-        </div>
-        <div class="row">
-            <div class="form-group col-12">
-                <label for="Clinic" class="control-label">Clinic</label>
-                <input disabled id="Clinic" value="@Model.Clinic.Address" class="form-control" />
+    <div class="col-12 pd-2">
+        <div class="card custom-card">
+            <div class="row">
+                <h1 class="col-12">Clinics</h1>
             </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <label for="Clinic" class="control-label">Clinic</label>
+                    <input disabled id="Clinic" value="@Model.Clinic.Address" class="form-control" />
+                </div>
 
-            <h2 class="col-12">Best time</h2>
+                <h2 class="col-12">Best time</h2>
 
-            <div class="form-group col-3">
-                <label for="startDayBestClinic" class="control-label">startDay</label>
-                <select disabled id="startDayBestClinic" asp-for="BestTimeForVisit.StartDay" asp-items="@DaySelectList" class="form-control"></select>
-            </div>
-            <div class="form-group col-3">
-                <label for="endDayBestClinic" class="control-label">endDay</label>
-                <select disabled id="endDayBestClinic" asp-for="BestTimeForVisit.EndDay" asp-items="@DaySelectList" class="form-control"></select>
-            </div>
-            <div class="form-group col-3">
-                <label for="startTimeBestClinic" class="control-label">startTime</label>
-                <input disabled id="startTimeBestClinic" asp-for="BestTimeForVisit.StartTime" name="startTime" type="time" class="form-control" />
-            </div>
-            <div class="form-group col-3">
-                <label for="endTimeBestClinic" class="control-label">endTime</label>
-                <input disabled id="endTimeBestClinic" asp-for="BestTimeForVisit.EndTime" name="endTime" type="time" class="form-control" />
-            </div>
+                <div class="form-group col-3">
+                    <label for="startDayBestClinic" class="control-label">startDay</label>
+                    <select disabled id="startDayBestClinic" asp-for="BestTimeForVisit.StartDay" asp-items="@DaySelectList" class="form-control"></select>
+                </div>
+                <div class="form-group col-3">
+                    <label for="endDayBestClinic" class="control-label">endDay</label>
+                    <select disabled id="endDayBestClinic" asp-for="BestTimeForVisit.EndDay" asp-items="@DaySelectList" class="form-control"></select>
+                </div>
+                <div class="form-group col-3">
+                    <label for="startTimeBestClinic" class="control-label">startTime</label>
+                    <input disabled id="startTimeBestClinic" asp-for="BestTimeForVisit.StartTime" name="startTime" type="time" class="form-control" />
+                </div>
+                <div class="form-group col-3">
+                    <label for="endTimeBestClinic" class="control-label">endTime</label>
+                    <input disabled id="endTimeBestClinic" asp-for="BestTimeForVisit.EndTime" name="endTime" type="time" class="form-control" />
+                </div>
 
-            <h2 class="col-12">Times</h2>
-            
-            <div hidden class="form-group col-3 edit">
-                <label for="startDayClinic" class="control-label">startDay</label>
-                <select disabled id="startDayClinic" asp-items="@DaySelectList" class="form-control"></select>
-            </div>
-            <div hidden class="form-group col-3 edit">
-                <label for="endDayClinic" class="control-label">endDay</label>
-                <select disabled id="endDayClinic" asp-items="@DaySelectList" class="form-control"></select>
-            </div>
-            <div hidden class="form-group col-2 edit">
-                <label for="startTimeClinic" class="control-label">startTime</label>
-                <input disabled id="startTimeClinic" name="startTime" type="time" class="form-control" />
-            </div>
-            <div hidden class="form-group col-2 edit">
-                <label for="endTimeClinic" class="control-label">endTime</label>
-                <input disabled id="endTimeClinic" name="endTime" type="time" class="form-control" />
-            </div>
-            <div hidden class="form-group col-2 edit">
-                <label for="add_time_clinic" class="control-label">&nbsp;</label>
-                <button hidden type="button" id="add_time_clinic" class="form-control btn btn-outline-info">Add</button>
-            </div>
-           
-            <div class="form-group col-12">
-                <table class="table form-group col-12" id="t_times_clinic">
-                    <thead>
-                        <tr>
-                            <th scope="col">startDay</th>
-                            <th scope="col">endDay</th>
-                            <th scope="col">startTime</th>
-                            <th scope="col" >endTime</th>
-                            <th hidden></th>
-                            <th class="edit"  hidden width="8%" scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Times)
-                        {
+                <h2 class="col-12">Times</h2>
+
+                <div hidden class="form-group col-3 edit">
+                    <label for="startDayClinic" class="control-label">startDay</label>
+                    <select disabled id="startDayClinic" asp-items="@DaySelectList" class="form-control"></select>
+                </div>
+                <div hidden class="form-group col-3 edit">
+                    <label for="endDayClinic" class="control-label">endDay</label>
+                    <select disabled id="endDayClinic" asp-items="@DaySelectList" class="form-control"></select>
+                </div>
+                <div hidden class="form-group col-2 edit">
+                    <label for="startTimeClinic" class="control-label">startTime</label>
+                    <input disabled id="startTimeClinic" name="startTime" type="time" class="form-control" />
+                </div>
+                <div hidden class="form-group col-2 edit">
+                    <label for="endTimeClinic" class="control-label">endTime</label>
+                    <input disabled id="endTimeClinic" name="endTime" type="time" class="form-control" />
+                </div>
+                <div hidden class="form-group col-2 edit">
+                    <label for="add_time_clinic" class="control-label">&nbsp;</label>
+                    <button hidden type="button" id="add_time_clinic" class="form-control btn btn-outline-info">Add</button>
+                </div>
+
+                <div class="form-group col-12">
+                    <table class="table form-group col-12" id="t_times_clinic">
+                        <thead>
                             <tr>
-                                <td>@item.StartDay</td>
-                                <td>@item.EndDay</td>
-                                <td> @item.StartTime</td>
-                                <td> @item.EndTime</td>
-                                <td hidden>@item.Id</td>
-                                <td class="edit" hidden>
-                                    <input hidden disabled type="button" onclick="Remove(this);" class="btn btn-danger btn-sm edit" value="x" />
-                                </td>
+                                <th scope="col">startDay</th>
+                                <th scope="col">endDay</th>
+                                <th scope="col">startTime</th>
+                                <th scope="col">endTime</th>
+                                <th hidden></th>
+                                <th class="edit" hidden width="8%" scope="col"></th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="offset-12 form-group mt-3 col-3">
-                <button onclick="toggle()" class="btn btn-info mr-2">
-                    Edit
-                </button>
-                <button hidden id="btnSave" class="btn btn-info mr-2">
-                    Save
-                </button>
-                <a asp-action="Details" asp-route-id="@Model.DoctorId" class="btn btn-warning text-white">Back</a>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Times)
+                            {
+                                <tr>
+                                    <td>@item.StartDay</td>
+                                    <td>@item.EndDay</td>
+                                    <td> @item.StartTime</td>
+                                    <td> @item.EndTime</td>
+                                    <td hidden>@item.Id</td>
+                                    <td class="edit" hidden>
+                                        <input hidden disabled type="button" onclick="Remove(this);" class="btn btn-danger btn-sm edit" value="x" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="offset-12 form-group mt-3 col-3">
+                    <button onclick="toggle()" class="btn btn-info mr-2">
+                        Edit
+                    </button>
+                    <button hidden id="btnSave" class="btn btn-info mr-2">
+                        Save
+                    </button>
+                    <a asp-action="Details" asp-route-id="@Model.DoctorId" class="btn btn-warning text-white">Back</a>
+                </div>
             </div>
         </div>
     </div>
@@ -241,7 +243,7 @@
                 time.endDay = daysText[row.find("TD").eq(1).html()];
                 time.startTime = row.find("TD").eq(2).html().trim();
                 time.endTime = row.find("TD").eq(3).html().trim();
-                time.id = parseInt(row.find("TD").eq(4).html().trim());                    
+                time.id = parseInt(row.find("TD").eq(4).html().trim());
                 clinic.times.push(time);
             });
 

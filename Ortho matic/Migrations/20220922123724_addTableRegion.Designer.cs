@@ -10,8 +10,8 @@ using Ortho_matic.Data;
 namespace Ortho_matic.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220921133641_addRegionInClinic")]
-    partial class addRegionInClinic
+    [Migration("20220922123724_addTableRegion")]
+    partial class addTableRegion
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -245,7 +245,7 @@ namespace Ortho_matic.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<int>("RegionId")
+                    b.Property<int?>("RegionId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -346,7 +346,7 @@ namespace Ortho_matic.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<int>("RegionId")
+                    b.Property<int?>("RegionId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -420,7 +420,7 @@ namespace Ortho_matic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RegionId")
+                    b.Property<int?>("RegionId")
                         .HasColumnType("int");
 
                     b.HasIndex("RegionId");
@@ -483,9 +483,7 @@ namespace Ortho_matic.Migrations
                 {
                     b.HasOne("Ortho_matic.Models.Region", "Region")
                         .WithMany()
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RegionId");
 
                     b.Navigation("Region");
                 });
@@ -544,9 +542,7 @@ namespace Ortho_matic.Migrations
                 {
                     b.HasOne("Ortho_matic.Models.Region", "Region")
                         .WithMany()
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RegionId");
 
                     b.Navigation("Region");
                 });
@@ -566,9 +562,7 @@ namespace Ortho_matic.Migrations
                 {
                     b.HasOne("Ortho_matic.Models.Region", "Region")
                         .WithMany()
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RegionId");
 
                     b.Navigation("Region");
                 });

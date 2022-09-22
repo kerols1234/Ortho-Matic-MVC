@@ -15,142 +15,151 @@
 }
 
 <div class="row" style="width:100%">
-    <div class="col-12 card custom-card">
-        <div class="row">
-            <input asp-for="Id" hidden class="form-control" type="text">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group col-3">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" disabled class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group col-3">
-                <label asp-for="DoctorSpecialty" class="control-label"></label>
-                <select asp-for="DoctorSpecialty" disabled asp-items="@DoctorSpecialtySelectList" class="form-control"></select>
-                <span asp-validation-for="DoctorSpecialty" class="text-danger"></span>
-            </div>
-            <div class="form-group col-3">
-                <label asp-for="DoctorDegree" class="control-label"></label>
-                <select asp-for="DoctorDegree" disabled asp-items="@DoctorDegreeSelectList" class="form-control"></select>
-                <span asp-validation-for="DoctorDegree" class="text-danger"></span>
-            </div>
-            <div class="form-group col-3">
-                <label asp-for="PhoneNumber" class="control-label"></label>
-                <input asp-for="PhoneNumber" disabled class="form-control" />
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-            </div>
-            <div class="offset-12 form-group mt-3 col-3">
-                <button type="button" onclick="toggle()" class="btn btn-info mr-2">
-                    Edit
-                </button>
-                <button type="button" hidden onclick="saveChanges()" class="btn btn-info mr-2">
-                    Save
-                </button>
-                <button type="button" hidden onclick="toggle()" class="btn btn-warning text-white">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 card custom-card">
-        <div class="row">
-            <div class="offset-10 col-3 mb-3">
-                <a asp-action="AddClinic" asp-route-id="@Model.Id" class="btn btn-info mr-2">
-                    Add Clinic
-                </a>
-            </div>
-            <div class="form-group col-12">
-                <table class="table" id="doctor_clinic">
-                    <thead>
-                        <tr>
-                            <th scope="col">Address</th>
-                            <th scope="col">PhoneNumber</th>
-                            <th scope="col">StartDay</th>
-                            <th scope="col">EndDay</th>
-                            <th scope="col">StartTime</th>
-                            <th scope="col">EndTime</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.DoctorClinics)
-                        {
-                            <tr >
-                                <th>@item.Clinic.Address</th>
-                                <th>@item.Clinic.PhoneNumber</th>
-                                <th>@item.BestTimeForVisit.StartDay</th>
-                                <th>@item.BestTimeForVisit.EndDay</th>
-                                <th>@item.BestTimeForVisit.StartTime</th>
-                                <th>@item.BestTimeForVisit.EndTime</th>
-                                <th>
-                                    <div class="text-center">
-                                        <a href="/Doctors/DetailsClinic?idD=@item.DoctorId&idC=@item.ClinicId" class='btn btn-success text-white' style='cursor:pointer;'>
-                                            <i class="fa fa-book"></i>
-                                        </a>
-                                        &nbsp;
-                                        <a class='btn btn-danger text-white' style='cursor:pointer;'
-                                        onclick='Delete("/Doctors/DeleteDoctorClinic?idD=@item.DoctorId&idC=@item.ClinicId",this,"doctor_clinic")'>
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </th>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <div class="col-12 pd-2">
+        <div class="card custom-card">
+            <div class="row">
+                <input asp-for="Id" hidden class="form-control" type="text">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group col-3">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" disabled class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="DoctorSpecialty" class="control-label"></label>
+                    <select asp-for="DoctorSpecialty" disabled asp-items="@DoctorSpecialtySelectList" class="form-control"></select>
+                    <span asp-validation-for="DoctorSpecialty" class="text-danger"></span>
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="DoctorDegree" class="control-label"></label>
+                    <select asp-for="DoctorDegree" disabled asp-items="@DoctorDegreeSelectList" class="form-control"></select>
+                    <span asp-validation-for="DoctorDegree" class="text-danger"></span>
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="PhoneNumber" class="control-label"></label>
+                    <input asp-for="PhoneNumber" disabled class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+                <div class="offset-12 form-group mt-3 col-3">
+                    <button type="button" onclick="toggle()" class="btn btn-info mr-2">
+                        Edit
+                    </button>
+                    <button type="button" hidden onclick="saveChanges()" class="btn btn-info mr-2">
+                        Save
+                    </button>
+                    <button type="button" hidden onclick="toggle()" class="btn btn-warning text-white">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
+
     </div>
-    <div class="col-12 card custom-card">
-        <div class="row">
-            <div class="offset-10 col-3  mb-3">
-                <a asp-action="AddHospital" asp-route-id="@Model.Id" class="btn btn-info mr-2">
-                    Add Hospital
-                </a>
-            </div>
-            <div class="form-group col-12">
-                <table class="table" id="doctor_hospital">
-                    <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Address</th>
-                            <th scope="col">PhoneNumber</th>
-                            <th scope="col">StartDay</th>
-                            <th scope="col">EndDay</th>
-                            <th scope="col">StartTime</th>
-                            <th scope="col">EndTime</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.DoctorHospitals)
-                        {
+    <div class="col-12 pd-2">
+        <div class="card custom-card">
+            <div class="row">
+                <div class="offset-10 col-3 mb-3">
+                    <a asp-action="AddClinic" asp-route-id="@Model.Id" class="btn btn-info mr-2">
+                        Add Clinic
+                    </a>
+                </div>
+                <div class="form-group col-12">
+                    <table class="table" id="doctor_clinic">
+                        <thead>
                             <tr>
-                                <th>@item.Hospital.Name</th>
-                                <th>@item.Hospital.Address</th>
-                                <th>@item.Hospital.PhoneNumber</th>
-                                <th>@item.BestTimeForVisit.StartDay</th>
-                                <th>@item.BestTimeForVisit.EndDay</th>
-                                <th>@item.BestTimeForVisit.StartTime</th>
-                                <th>@item.BestTimeForVisit.EndTime</th>
-                                <th>
-                                    <div class="text-center">
-                                        <a href="/Doctors/DetailsHospital?idD=@item.DoctorId&idH=@item.HospitalId" class='btn btn-success text-white' style='cursor:pointer;'>
-                                            <i class="fa fa-book"></i>
-                                        </a>
-                                        &nbsp;
-                                        <a class='btn btn-danger text-white' style='cursor:pointer;'
-                                       onclick='Delete("/Doctors/DeleteDoctorHospital?idD=@item.DoctorId&idH=@item.HospitalId",this,"doctor_hospital")'>
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </th>
+                                <th scope="col">Address</th>
+                                <th scope="col">PhoneNumber</th>
+                                <th scope="col">StartDay</th>
+                                <th scope="col">EndDay</th>
+                                <th scope="col">StartTime</th>
+                                <th scope="col">EndTime</th>
+                                <th scope="col"></th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.DoctorClinics)
+                            {
+                                <tr>
+                                    <th>@item.Clinic.Address</th>
+                                    <th>@item.Clinic.PhoneNumber</th>
+                                    <th>@item.BestTimeForVisit.StartDay</th>
+                                    <th>@item.BestTimeForVisit.EndDay</th>
+                                    <th>@item.BestTimeForVisit.StartTime</th>
+                                    <th>@item.BestTimeForVisit.EndTime</th>
+                                    <th>
+                                        <div class="text-center">
+                                            <a href="/Doctors/DetailsClinic?idD=@item.DoctorId&idC=@item.ClinicId" class='btn btn-success text-white' style='cursor:pointer;'>
+                                                <i class="fa fa-book"></i>
+                                            </a>
+                                            &nbsp;
+                                            <a class='btn btn-danger text-white' style='cursor:pointer;'
+                                           onclick='Delete("/Doctors/DeleteDoctorClinic?idD=@item.DoctorId&idC=@item.ClinicId",this,"doctor_clinic")'>
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                        </div>
+                                    </th>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
+    </div>
+    <div class="col-12 pd-2">
+        <div class="card custom-card">
+            <div class="row">
+                <div class="offset-10 col-3  mb-3">
+                    <a asp-action="AddHospital" asp-route-id="@Model.Id" class="btn btn-info mr-2">
+                        Add Hospital
+                    </a>
+                </div>
+                <div class="form-group col-12">
+                    <table class="table" id="doctor_hospital">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Address</th>
+                                <th scope="col">PhoneNumber</th>
+                                <th scope="col">StartDay</th>
+                                <th scope="col">EndDay</th>
+                                <th scope="col">StartTime</th>
+                                <th scope="col">EndTime</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.DoctorHospitals)
+                            {
+                                <tr>
+                                    <th>@item.Hospital.Name</th>
+                                    <th>@item.Hospital.Address</th>
+                                    <th>@item.Hospital.PhoneNumber</th>
+                                    <th>@item.BestTimeForVisit.StartDay</th>
+                                    <th>@item.BestTimeForVisit.EndDay</th>
+                                    <th>@item.BestTimeForVisit.StartTime</th>
+                                    <th>@item.BestTimeForVisit.EndTime</th>
+                                    <th>
+                                        <div class="text-center">
+                                            <a href="/Doctors/DetailsHospital?idD=@item.DoctorId&idH=@item.HospitalId" class='btn btn-success text-white' style='cursor:pointer;'>
+                                                <i class="fa fa-book"></i>
+                                            </a>
+                                            &nbsp;
+                                            <a class='btn btn-danger text-white' style='cursor:pointer;'
+                                           onclick='Delete("/Doctors/DeleteDoctorHospital?idD=@item.DoctorId&idH=@item.HospitalId",this,"doctor_hospital")'>
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                        </div>
+                                    </th>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

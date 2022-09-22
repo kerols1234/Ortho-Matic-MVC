@@ -23,10 +23,14 @@ namespace Ortho_matic.Controllers
         public IActionResult Index(int? id)
         {
             Hospital hospital = new Hospital() { Name = "", Address = "" };
+
             if (id != null)
             {
                 hospital = _context.Hospitals.FirstOrDefault(obj => obj.Id == id);
             }
+
+            ViewBag.Regions = _context.Regions.ToList();
+
             return View(hospital);
         }
 
@@ -48,6 +52,8 @@ namespace Ortho_matic.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.Regions = _context.Regions.ToList();
 
             return View(hospital);
         }
@@ -83,10 +89,11 @@ namespace Ortho_matic.Controllers
             {
                 data = await _context.Hospitals.Include(obj => obj.DoctorHospitals).Select(obj => new
                 {
-                    Id = obj.Id,
-                    Name = obj.Name,
-                    Address = obj.Address,
-                    PhoneNumber = obj.PhoneNumber,
+                    obj.Id,
+                    obj.Name,
+                    Region = obj.Region != null ? obj.Region.Name : "no region selected",
+                    obj.Address,
+                    obj.PhoneNumber,
                     NumberOfDoctors = obj.DoctorHospitals.Count()
                 }).ToListAsync()
             });

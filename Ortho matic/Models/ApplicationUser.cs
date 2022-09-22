@@ -10,7 +10,7 @@ namespace Ortho_matic.Models
         [Required]
         public string EmployeeName { get; set; }
 
-        public int RegionId { get; set; }
+        public int? RegionId { get; set; }
         [ForeignKey("RegionId")]
         public virtual Region Region { get; set; }
     }

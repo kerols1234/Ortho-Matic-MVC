@@ -22,7 +22,7 @@ namespace Ortho_matic.Models
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         public virtual ICollection<DoctorHospital> DoctorHospitals { get; set; }
-        public int RegionId { get; set; }
+        public int? RegionId { get; set; }
         [ForeignKey("RegionId")]
         public virtual Region Region { get; set; }
     }

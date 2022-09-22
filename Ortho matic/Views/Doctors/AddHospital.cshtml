@@ -9,83 +9,84 @@
 }
 
 <div class="row">
-    <div class="col-12 card custom-card">
-        <div class="row">
-            <h1 class="col-12">Hospitals</h1>
-        </div>
-        <div class="row">
-            <div class="form-group col-12">
-                <label for="Hospital" class="control-label">Hospital</label>
-                <select id="Hospital" asp-items="@Model" class="form-control"></select>
+    <div class="col-12 pd-2">
+        <div class="card custom-card">
+            <div class="row">
+                <h1 class="col-12">Hospitals</h1>
             </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <label for="Hospital" class="control-label">Hospital</label>
+                    <select id="Hospital" asp-items="@Model" class="form-control"></select>
+                </div>
 
-            <h2 class="col-12">Best time</h2>
+                <h2 class="col-12">Best time</h2>
 
-            <div class="form-group col-3">
-                <label for="startDayBestHospital" class="control-label">startDay</label>
-                <select id="startDayBestHospital" asp-items="@DaySelectList" class="form-control"></select>
-            </div>
-            <div class="form-group col-3">
-                <label for="endDayBestHospital" class="control-label">endDay</label>
-                <select id="endDayBestHospital" asp-items="@DaySelectList" class="form-control"></select>
-            </div>
-            <div class="form-group col-3">
-                <label for="startTimeBestHospital" class="control-label">startTime</label>
-                <input id="startTimeBestHospital" name="startTime" type="time" class="form-control" />
-            </div>
-            <div class="form-group col-3">
-                <label for="endTimeBestHospital" class="control-label">endTime</label>
-                <input id="endTimeBestHospital" name="endTime" type="time" class="form-control" />
-            </div>
+                <div class="form-group col-3">
+                    <label for="startDayBestHospital" class="control-label">startDay</label>
+                    <select id="startDayBestHospital" asp-items="@DaySelectList" class="form-control"></select>
+                </div>
+                <div class="form-group col-3">
+                    <label for="endDayBestHospital" class="control-label">endDay</label>
+                    <select id="endDayBestHospital" asp-items="@DaySelectList" class="form-control"></select>
+                </div>
+                <div class="form-group col-3">
+                    <label for="startTimeBestHospital" class="control-label">startTime</label>
+                    <input id="startTimeBestHospital" name="startTime" type="time" class="form-control" />
+                </div>
+                <div class="form-group col-3">
+                    <label for="endTimeBestHospital" class="control-label">endTime</label>
+                    <input id="endTimeBestHospital" name="endTime" type="time" class="form-control" />
+                </div>
 
-            <h2 class="col-12">Times</h2>
+                <h2 class="col-12">Times</h2>
 
-            <div class="form-group col-3">
-                <label for="startDayHospital" class="control-label">startDay</label>
-                <select id="startDayHospital" asp-items="@DaySelectList" class="form-control"></select>
-            </div>
-            <div class="form-group col-3">
-                <label for="endDayHospital" class="control-label">endDay</label>
-                <select id="endDayHospital" asp-items="@DaySelectList" class="form-control"></select>
-            </div>
-            <div class="form-group col-2">
-                <label for="startTimeHospital" class="control-label">startTime</label>
-                <input id="startTimeHospital" name="startTime" type="time" class="form-control" />
-            </div>
-            <div class="form-group col-2">
-                <label for="endTimeHospital" class="control-label">endTime</label>
-                <input id="endTimeHospital" name="endTime" type="time" class="form-control" />
-            </div>
-            <div class="form-group col-2">
-                <label for="add_time_hospital" class="control-label">&nbsp;</label>
-                <button type="button" id="add_time_hospital" class="form-control btn btn-outline-info">Add</button>
-            </div>
+                <div class="form-group col-3">
+                    <label for="startDayHospital" class="control-label">startDay</label>
+                    <select id="startDayHospital" asp-items="@DaySelectList" class="form-control"></select>
+                </div>
+                <div class="form-group col-3">
+                    <label for="endDayHospital" class="control-label">endDay</label>
+                    <select id="endDayHospital" asp-items="@DaySelectList" class="form-control"></select>
+                </div>
+                <div class="form-group col-2">
+                    <label for="startTimeHospital" class="control-label">startTime</label>
+                    <input id="startTimeHospital" name="startTime" type="time" class="form-control" />
+                </div>
+                <div class="form-group col-2">
+                    <label for="endTimeHospital" class="control-label">endTime</label>
+                    <input id="endTimeHospital" name="endTime" type="time" class="form-control" />
+                </div>
+                <div class="form-group col-2">
+                    <label for="add_time_hospital" class="control-label">&nbsp;</label>
+                    <button type="button" id="add_time_hospital" class="form-control btn btn-outline-info">Add</button>
+                </div>
 
-            <div class="form-group col-12">
-                <table class="table form-group col-12" id="t_times_hospital">
-                    <thead>
-                        <tr>
-                            <th scope="col" width="23%">startDay</th>
-                            <th scope="col" width="23%">endDay</th>
-                            <th scope="col" width="23%">startTime</th>
-                            <th scope="col" width="23%">endTime</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="form-group col-12">
+                    <table class="table form-group col-12" id="t_times_hospital">
+                        <thead>
+                            <tr>
+                                <th scope="col" width="23%">startDay</th>
+                                <th scope="col" width="23%">endDay</th>
+                                <th scope="col" width="23%">startTime</th>
+                                <th scope="col" width="23%">endTime</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
 
-            </div>
-            <div class="offset-12 form-group mt-3 col-3">
-                <button type="submit" id="btnSave" class="btn btn-info mr-2">
-                    Create
-                </button>
-                <a asp-action="Details" asp-route-id="@ViewData["id"]" class="btn btn-warning text-white">Cancel</a>
+                </div>
+                <div class="offset-12 form-group mt-3 col-3">
+                    <button type="submit" id="btnSave" class="btn btn-info mr-2">
+                        Create
+                    </button>
+                    <a asp-action="Details" asp-route-id="@ViewData["id"]" class="btn btn-warning text-white">Cancel</a>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
 
 @section Scripts {

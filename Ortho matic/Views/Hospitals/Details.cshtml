@@ -2,28 +2,27 @@
 
 @{
     ViewData["Title"] = "Details";
+    SelectList regionLst = new SelectList(ViewBag.Regions, "Id", "Name", Model.RegionId ?? -1);
 }
 
 <div class="row" style="width:100%">
-    <div class="col-12 card custom-card">
-        <div class="row">
+    <div class="col-12 pb-2">
+        <div class="card custom-card">
+            <div class="row">
                 <input asp-for="Id" hidden class="form-control" type="text">
-                <div class="form-group col-3">
+                <div class="form-group col-5">
                     <label asp-for="Name"></label>
                     <input disabled asp-for="Name" class="form-control" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
-                <div class="form-group col-3">
-                    <label asp-for="PhoneNumber"></label>
-                    <input disabled asp-for="PhoneNumber" class="form-control" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                <div class="form-group col-5">
+                    <label asp-for="Region"></label>
+                    <select disabled asp-for="RegionId" asp-items="regionLst" class="form-control">
+                        <option value="-1">no region selected</option>
+                    </select>
+                    <span id="Region" asp-validation-for="Region" class="text-danger"></span>
                 </div>
-                <div class="form-group col-3">
-                    <label asp-for="Address"></label>
-                <input disabled asp-for="Address" class="form-control" />
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-                <div class="form-group col-3">
+                <div class="form-group col-2">
                     <div class="mapouter">
                         <div class="gmap_canvas">
                             <iframe width="80" height="80" id="gmap_canvas" src="https://maps.google.com/maps?q=egypt%20giza%20semsema&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a href="https://2piratebay.org">pirate bay</a><br><style>
@@ -42,62 +41,78 @@
                         </div>
                     </div>
                 </div>
-            <div class="offset-12 form-group mt-3 col-3">
-                <button type="button" onclick="toggle()" class="btn btn-info mr-2">
-                    Edit
-                </button>
-                <button type="button" hidden onclick="saveChanges()" class="btn btn-info mr-2">
-                    Save
-                </button>
-                <button type="button" hidden onclick="toggle()" class="btn btn-warning text-white">
-                    Cancel
-                </button>
+                <div class="form-group col-4">
+                    <label asp-for="PhoneNumber"></label>
+                    <input disabled asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="Address"></label>
+                    <input disabled asp-for="Address" class="form-control" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <div class="offset-12 form-group mt-3 col-3">
+                    <button type="button" onclick="toggle()" class="btn btn-info mr-2">
+                        Edit
+                    </button>
+                    <button type="button" hidden onclick="saveChanges()" class="btn btn-info mr-2">
+                        Save
+                    </button>
+                    <button type="button" hidden onclick="toggle()" class="btn btn-warning text-white">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
+
     </div>
-    <div class="col-12 card custom-card">
-        <div class="row">
-            <div class="form-group col-12">
-                <table class="table" id="doctor_hospital">
-                    <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Specialty</th>
-                            <th scope="col">StartDay</th>
-                            <th scope="col">EndDay</th>
-                            <th scope="col">StartTime</th>
-                            <th scope="col">EndTime</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.DoctorHospitals)
-                        {
+    <div class="col-12 pb-2">
+        <div class="card custom-card">
+            <div class="row">
+                <div class="form-group col-12">
+                    <table class="table" id="doctor_hospital">
+                        <thead>
                             <tr>
-                                <th>@item.Doctor.Name</th>
-                                <th>@item.Doctor.DoctorSpecialty</th>
-                                <th>@item.BestTimeForVisit.StartDay</th>
-                                <th>@item.BestTimeForVisit.EndDay</th>
-                                <th>@item.BestTimeForVisit.StartTime</th>
-                                <th>@item.BestTimeForVisit.EndTime</th>
-                                <th>
-                                    <div class="text-center">
-                                        <a href="/Doctors/Details?id=@item.DoctorId" class='btn btn-success text-white' style='cursor:pointer;'>
-                                            <i class="fa fa-book"></i>
-                                        </a>
-                                        &nbsp;
-                                        <a class='btn btn-danger text-white' style='cursor:pointer;'
-                                       onclick='Delete("/Doctors/DeleteDoctorHospital?idD=@item.DoctorId&idH=@item.HospitalId",this,"doctor_hospital")'>
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Specialty</th>
+                                <th scope="col">StartDay</th>
+                                <th scope="col">EndDay</th>
+                                <th scope="col">StartTime</th>
+                                <th scope="col">EndTime</th>
+                                <th scope="col"></th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.DoctorHospitals)
+                            {
+                                <tr>
+                                    <th>@item.Doctor.Name</th>
+                                    <th>@item.Doctor.DoctorSpecialty</th>
+                                    <th>@item.BestTimeForVisit.StartDay</th>
+                                    <th>@item.BestTimeForVisit.EndDay</th>
+                                    <th>@item.BestTimeForVisit.StartTime</th>
+                                    <th>@item.BestTimeForVisit.EndTime</th>
+                                    <th>
+                                        <div class="text-center">
+                                            <a href="/Doctors/Details?id=@item.DoctorId" class='btn btn-success text-white' style='cursor:pointer;'>
+                                                <i class="fa fa-book"></i>
+                                            </a>
+                                            &nbsp;
+                                            <a class='btn btn-danger text-white' style='cursor:pointer;'
+                                           onclick='Delete("/Doctors/DeleteDoctorHospital?idD=@item.DoctorId&idH=@item.HospitalId",this,"doctor_hospital")'>
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                        </div>
+                                    </th>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -122,6 +137,15 @@
             hospital.Name = $("#Name").val();
             hospital.Address = $("#Address").val();
             hospital.PhoneNumber = $("#PhoneNumber").val();
+            hospital.regionId = parseInt($("#RegionId option:selected").val());
+
+            if (hospital.regionId == -1) {
+                console.log("e");
+                $("#Region").text("must select region");
+                return;
+            } else {
+                $("#Region").text('');
+            }
 
             console.log(JSON.stringify(hospital));
 
