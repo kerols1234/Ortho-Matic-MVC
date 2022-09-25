@@ -12,7 +12,6 @@ using Ortho_matic.Models;
 using System;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace Ortho_matic
 {
@@ -48,12 +47,12 @@ namespace Ortho_matic
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    ValidIssuer = Configuration["JWT:ValidAudience"],
+                    ValidAudience = Configuration["JWT:ValidIssuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
                 };
             });
-            services.AddControllersWithViews().AddJsonOptions(o => o.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString); ;
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,8 +82,6 @@ namespace Ortho_matic
 
             app.UseAuthorization();
 
-            // seeder.Initialize();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -100,12 +97,21 @@ namespace Ortho_matic
             try
             {
                 context.Database.Migrate();
+
                 if (!context.Roles.Any(role => role.Name == "Admin"))
                 {
                     var admin = new IdentityRole("Admin");
                     var r = roleManager.CreateAsync(admin).Result;
                 }
+
+                if (!context.Roles.Any(role => role.Name == "Staff"))
+                {
+                    var staff = new IdentityRole("Staff");
+                    var r = roleManager.CreateAsync(staff).Result;
+                }
+
                 context.SaveChanges();
+
                 if (!context.Users.Any(obj => obj.Email == "admin@admin.com"))
                 {
                     var user = new ApplicationUser
@@ -114,10 +120,13 @@ namespace Ortho_matic
                         EmployeeName = "admin",
                         UserName = "admin",
                     };
+
                     var r = userManager.CreateAsync(user, "123456kE@").Result;
                     var e = userManager.AddToRoleAsync(user, "Admin").Result;
+
                     context.Users.Add(user);
                 }
+
                 context.SaveChanges();
             }
             catch (Exception ex)

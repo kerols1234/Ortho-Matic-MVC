@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ortho_matic.Data;
 
 namespace Ortho_matic.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220925142019_addTableVisitation")]
+    partial class addTableVisitation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -417,13 +419,7 @@ namespace Ortho_matic.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("ClinicId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("DoctorId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("HospitalId")
                         .HasColumnType("int");
 
                     b.Property<double?>("Latitude")
@@ -440,11 +436,7 @@ namespace Ortho_matic.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClinicId");
-
                     b.HasIndex("DoctorId");
-
-                    b.HasIndex("HospitalId");
 
                     b.HasIndex("UserId");
 
@@ -599,27 +591,15 @@ namespace Ortho_matic.Migrations
 
             modelBuilder.Entity("Ortho_matic.Models.Visitation", b =>
                 {
-                    b.HasOne("Ortho_matic.Models.Clinic", "Clinic")
-                        .WithMany()
-                        .HasForeignKey("ClinicId");
-
                     b.HasOne("Ortho_matic.Models.Doctor", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId");
-
-                    b.HasOne("Ortho_matic.Models.Hospital", "Hospital")
-                        .WithMany()
-                        .HasForeignKey("HospitalId");
 
                     b.HasOne("Ortho_matic.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
-                    b.Navigation("Clinic");
-
                     b.Navigation("Doctor");
-
-                    b.Navigation("Hospital");
 
                     b.Navigation("User");
                 });

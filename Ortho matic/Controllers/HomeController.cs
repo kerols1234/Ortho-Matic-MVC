@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ortho_matic.Models;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 namespace Ortho_matic.Controllers
 {
     [Authorize]
+    [EnableCors]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

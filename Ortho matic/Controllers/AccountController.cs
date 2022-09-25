@@ -1,13 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Ortho_matic.Data;
 using Ortho_matic.Models;
 using Ortho_matic.Models.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Ortho_matic.Controllers
@@ -256,6 +263,130 @@ namespace Ortho_matic.Controllers
                 return Json(new { success = true, message = "Delete successfull" });
             }
             return Json(new { success = false, message = "Error while deleting" });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithJWT([FromBody] LoginVM login)
+        {
+            IActionResult response = Unauthorized("Wrong email or password");
+            var user = await _userManager.FindByNameAsync(login.UserName);
+            if (user != null && await _userManager.CheckPasswordAsync(user, login.Password))
+            {
+                var token = GenerateJSONWebTokenAsync(user.UserName);
+                response = Ok(new
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(await token),
+                    expiration = TimeZoneInfo.ConvertTimeBySystemTimeZoneId((await token).ValidTo, "Egypt Standard Time").ToString("dd-MM-yyyy hh:mm tt"),
+                    userDate = await userInfoAsync(user.UserName)
+                });
+            }
+
+            return response;
+        }
+
+        private async Task<JwtSecurityToken> GenerateJSONWebTokenAsync(string userName)
+        {
+            var claims = new List<Claim> { new Claim("UserName", userName) };
+
+            var user = await _userManager.FindByNameAsync(userName);
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            foreach (var userRole in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(_config["JWT:ValidIssuer"],
+              _config["JWT:ValidAudience"],
+              claims,
+              expires: DateTime.Now.AddHours(8),
+              signingCredentials: credentials);
+
+            return token;
+        }
+
+        private async Task<object> userInfoAsync(string userName)
+        {
+            var user = await _db.ApplicationUsers.Include(obj => obj.Region).FirstOrDefaultAsync(obj => obj.UserName == userName);
+            if (user != null)
+            {
+                return new
+                {
+                    user.UserName,
+                    user.Email,
+                    user.PhoneNumber,
+                    user.EmployeeName,
+                    user.RegionId,
+                    RegionName = user.Region.Name,
+                };
+            }
+
+            return "Wrong User Name";
+        }
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UpdateFromMobile([FromBody] UpdateVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                IdentityResult result;
+
+                var claim = User.Claims.FirstOrDefault(obj => obj.Type == "UserName");
+
+                if (claim == null)
+                {
+                    return Ok(new { success = false, message = "Wrong User" });
+                }
+
+                var oldUser = _db.ApplicationUsers.Include(obj => obj.Region).FirstOrDefault(obj => obj.UserName == claim.Value);
+
+                if (oldUser == null)
+                {
+                    return Ok(new { success = false, message = "This user doe not exist" });
+                }
+
+                if (model.Password != null && model.Password.Trim() != "")
+                {
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(oldUser);
+                    result = await _userManager.ResetPasswordAsync(oldUser, code, model.Password);
+
+                    if (!result.Succeeded)
+                    {
+                        return Ok(new { success = false, message = result.Errors.ElementAt(0).Description });
+                    }
+                }
+
+                if (model.Email != null && model.Email.Trim() != "")
+                {
+                    oldUser.Email = model.Email;
+                }
+
+                if (model.PhoneNumber != null && model.PhoneNumber.Trim() != "")
+                {
+                    oldUser.PhoneNumber = model.PhoneNumber;
+                }
+
+                if (model.EmployeeName != null && model.EmployeeName.Trim() != "")
+                {
+                    oldUser.EmployeeName = model.EmployeeName;
+                }
+
+                result = await _userManager.UpdateAsync(oldUser);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new { success = true, message = "update successfull" });
+                }
+
+                return Ok(new { success = false, message = result.Errors.ElementAt(0).Description });
+            }
+            return Ok(new { success = false, message = "Error while updating" });
         }
     }
 }
