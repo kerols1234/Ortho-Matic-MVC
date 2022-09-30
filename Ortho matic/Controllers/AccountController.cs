@@ -322,7 +322,7 @@ namespace Ortho_matic.Controllers
                     user.PhoneNumber,
                     user.EmployeeName,
                     user.RegionId,
-                    RegionName = user.Region.Name,
+                    Region = user.Region.Name,
                 };
             }
 
@@ -381,7 +381,13 @@ namespace Ortho_matic.Controllers
 
                 if (result.Succeeded)
                 {
-                    return Ok(new { success = true, message = "update successfull" });
+                    var token = await GenerateJSONWebTokenAsync(oldUser.UserName);
+                    return Ok(new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                        expiration = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(token.ValidTo, "Egypt Standard Time").ToString("dd-MM-yyyy hh:mm tt"),
+                        userDate = await userInfoAsync(oldUser.UserName)
+                    });
                 }
 
                 return Ok(new { success = false, message = result.Errors.ElementAt(0).Description });
