@@ -21,7 +21,7 @@ namespace Ortho_matic.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? id)
+        public IActionResult Index(int? id)
         {
             var region = new Region();
             if (id != null)

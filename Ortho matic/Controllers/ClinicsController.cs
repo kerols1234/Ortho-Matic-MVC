@@ -92,7 +92,7 @@ namespace Ortho_matic.Controllers
                 {
                     Id = obj.Id,
                     Region = obj.Region != null ? obj.Region.Name : "no region selected",
-                    PhoneNumber = obj.PhoneNumber,
+                    Phone1 = obj.Phone1,
                     Address = obj.Address,
                     NumberOfDoctors = obj.DoctorClinics.Count()
                 }).ToListAsync()

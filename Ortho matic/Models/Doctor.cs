@@ -17,9 +17,6 @@ namespace Ortho_matic.Models
         [Required]
         public Specialty DoctorSpecialty { get; set; }
         public Degree DoctorDegree { get; set; }
-        [StringLength(11, ErrorMessage = "Invalid Mobile Number", MinimumLength = 11)]
-        [RegularExpression(@"^01([0-9]{9})", ErrorMessage = "Invalid Mobile Number")]
-        public string PhoneNumber { get; set; }
         public virtual ICollection<DoctorHospital> DoctorHospitals { get; set; }
         public virtual ICollection<DoctorClinic> DoctorClinics { get; set; }
     }
@@ -31,8 +28,8 @@ namespace Ortho_matic.Models
 
     public enum Specialty
     {
-        عظام,
-        جراحه,
-        علاج_طبيعي
+        Orthopedic,
+        Surgeon,
+        Physiotherapist
     }
 }

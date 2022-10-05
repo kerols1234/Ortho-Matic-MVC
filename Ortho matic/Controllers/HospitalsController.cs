@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -93,7 +94,7 @@ namespace Ortho_matic.Controllers
                     obj.Name,
                     Region = obj.Region != null ? obj.Region.Name : "no region selected",
                     obj.Address,
-                    obj.PhoneNumber,
+                    obj.Phone1,
                     NumberOfDoctors = obj.DoctorHospitals.Count()
                 }).ToListAsync()
             });
@@ -114,6 +115,76 @@ namespace Ortho_matic.Controllers
             _context.Hospitals.Remove(hos);
             _context.SaveChanges();
             return Json(new { success = true, message = "Delete successfull" });
+        }
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult AddHospital([FromBody] Hospital model)
+        {
+            if (ModelState.IsValid)
+            {
+                var claim = User.Claims.FirstOrDefault(obj => obj.Type == "UserName");
+
+                if (claim == null)
+                {
+                    return BadRequest("Wrong User");
+                }
+
+                var user = _context.ApplicationUsers.FirstOrDefault(obj => obj.UserName == claim.Value);
+
+                if (user == null)
+                {
+                    return BadRequest("This user doe not exist");
+                }
+
+                if (model.Name == null || model.Name.Trim() == "")
+                {
+                    return BadRequest("Hospital must contain name");
+                }
+
+                if (model.Address == null || model.Address.Trim() == "")
+                {
+                    return BadRequest("Hospital must contain address");
+                }
+
+                model.RegionId = user.RegionId;
+
+                _context.Hospitals.Add(model);
+                _context.SaveChanges();
+                return Ok(new { id = model.Id });
+            }
+            return BadRequest(ModelState.Values.ToString());
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult GetAllHospitalsMobile()
+        {
+            var claim = User.Claims.FirstOrDefault(obj => obj.Type == "UserName");
+
+            if (claim == null)
+            {
+                return BadRequest("Wrong User");
+            }
+
+            var user = _context.ApplicationUsers.FirstOrDefault(obj => obj.UserName == claim.Value);
+
+            if (user == null)
+            {
+                return BadRequest("This user doe not exist");
+            }
+
+            var list = _context
+                .Hospitals
+                .Where(obj => obj.RegionId == user.RegionId)
+                .Select(obj => new
+                {
+                    obj.Name,
+                    obj.Id
+                })
+                .ToList();
+
+            return Ok(list);
         }
     }
 }

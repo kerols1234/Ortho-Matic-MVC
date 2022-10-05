@@ -8,25 +8,21 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group col-3">
+                    <div class="form-group col-4">
                         <label asp-for="Doctor.Name"></label>
                         <input asp-for="Doctor.Name" id="Name" class="form-control" />
                     </div>
-                    <div class="form-group col-3">
-                        <label asp-for="Doctor.Id">فئه</label>
+                    <div class="form-group col-4">
+                        <label asp-for="Doctor.Id">Degree</label>
                         <select asp-for="Doctor.Id" id="DoctorDegree" asp-items="@Model.DoctorDegreeSelectList" class="form-control">
                             <option selected value="">Not Degree</option>
                         </select>
                     </div>
-                    <div class="form-group col-3">
-                        <label asp-for="Doctor.Id">فئه</label>
+                    <div class="form-group col-4">
+                        <label asp-for="Doctor.Id">Specialty</label>
                         <select asp-for="Doctor.Id" id="DoctorSpecialty" asp-items="@Model.DoctorSpecialtySelectList" class="form-control">
-                            <option selected value="">Not Degree</option>
+                            <option selected value="">Not Specialty</option>
                         </select>
-                    </div>
-                    <div class="form-group col-3">
-                        <label asp-for="Doctor.PhoneNumber"></label>
-                        <input asp-for="Doctor.PhoneNumber" id="PhoneNumber" class="form-control" />
                     </div>
                 </div>
             </div>
@@ -53,7 +49,6 @@
                             <th scope="col">Name</th>
                             <th scope="col">Degree</th>
                             <th scope="col">Specialty</th>
-                            <th scope="col">Phone Number</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -63,7 +58,6 @@
                             <th>Name</th>
                             <th>DoctorDegree</th>
                             <th>DoctorSpecialty</th>
-                            <th>PhoneNumber</th>
                             <th>Button</th>
                         </tr>
                     </tfoot>

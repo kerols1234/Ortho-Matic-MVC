@@ -1,7 +1,7 @@
 ﻿@model List<SelectListItem>
 
 @{
-    var DaySelectList = Enum.GetNames(typeof(DayOfWeekInArabic)).Select((i, c) => new SelectListItem
+    var DaySelectList = Enum.GetNames(typeof(DaysOfWeek)).Select((i, c) => new SelectListItem
             {
                 Text = i,
                 Value = c.ToString(),

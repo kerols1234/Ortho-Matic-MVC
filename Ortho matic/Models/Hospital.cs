@@ -16,11 +16,19 @@ namespace Ortho_matic.Models
         public string Name { get; set; }
         [Required]
         public string Address { get; set; }
+        [Required]
+        [Display(Name = "phone number 1")]
         [StringLength(11, ErrorMessage = "Invalid Mobile Number", MinimumLength = 11)]
         [RegularExpression(@"^01([0-9]{9})", ErrorMessage = "Invalid Mobile Number")]
-        public string PhoneNumber { get; set; }
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
+        public string Phone1 { get; set; }
+        [Display(Name = "phone number 2")]
+        [StringLength(11, ErrorMessage = "Invalid Mobile Number", MinimumLength = 11)]
+        [RegularExpression(@"^01([0-9]{9})", ErrorMessage = "Invalid Mobile Number")]
+        public string Phone2 { get; set; }
+        [Display(Name = "phone number 3")]
+        [StringLength(11, ErrorMessage = "Invalid Mobile Number", MinimumLength = 11)]
+        [RegularExpression(@"^01([0-9]{9})", ErrorMessage = "Invalid Mobile Number")]
+        public string Phone3 { get; set; }
         public virtual ICollection<DoctorHospital> DoctorHospitals { get; set; }
         public int? RegionId { get; set; }
         [ForeignKey("RegionId")]

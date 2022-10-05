@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -160,7 +161,6 @@ namespace Ortho_matic.Controllers
             {
                 data = await _context.Doctors.Select(obj => new
                 {
-                    obj.PhoneNumber,
                     obj.Name,
                     DoctorSpecialty = obj.DoctorSpecialty.ToString(),
                     obj.Id,
@@ -326,5 +326,41 @@ namespace Ortho_matic.Controllers
             return RedirectToAction(nameof(Details), new { id = doctorHospital.DoctorId });
         }
 
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult AddDoctor([FromBody]Doctor model)
+        {
+            if (ModelState.IsValid)
+            {
+                var claim = User.Claims.FirstOrDefault(obj => obj.Type == "UserName");
+
+                if (claim == null)
+                {
+                    return BadRequest("Wrong User");
+                }
+
+                var user = _context.ApplicationUsers.FirstOrDefault(obj => obj.UserName == claim.Value);
+
+                if (user == null)
+                {
+                    return BadRequest("This user doe not exist");
+                }
+
+                if (model.Name == null || model.Name.Trim() == "")
+                {
+                    return BadRequest("Doctor must contain name");
+                }
+                
+                foreach(var item in model.DoctorClinics)
+                {
+                    item.Clinic.RegionId = user.RegionId;
+                }
+
+                _context.Doctors.Add(model);
+                _context.SaveChanges();
+                return Ok(new { id = model.Id });
+            }
+            return BadRequest(ModelState.Values.ToString());
+        }
     }
 }

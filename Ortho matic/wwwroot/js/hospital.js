@@ -15,7 +15,7 @@ function loadDataTable() {
             { "data": "id" },
             { "data": "name" },
             { "data": "region" },
-            { "data": "phoneNumber" },
+            { "data": "phone1" },
             { "data": "address", "width": "25%" },
             { "data": "numberOfDoctors" },
             {

@@ -17,7 +17,6 @@ function loadDataTable() {
             { "data": "name" },
             { "data": "doctorDegree" },
             { "data": "doctorSpecialty" },
-            { "data": "phoneNumber" },
             {
                 "data": "id",
                 "render": function (data) {

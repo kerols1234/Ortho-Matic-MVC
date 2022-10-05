@@ -20,25 +20,20 @@
             <div class="row">
                 <input asp-for="Id" hidden class="form-control" type="text">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group col-3">
+                <div class="form-group col-4">
                     <label asp-for="Name" class="control-label"></label>
                     <input asp-for="Name" disabled class="form-control" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
-                <div class="form-group col-3">
+                <div class="form-group col-4">
                     <label asp-for="DoctorSpecialty" class="control-label"></label>
                     <select asp-for="DoctorSpecialty" disabled asp-items="@DoctorSpecialtySelectList" class="form-control"></select>
                     <span asp-validation-for="DoctorSpecialty" class="text-danger"></span>
                 </div>
-                <div class="form-group col-3">
+                <div class="form-group col-4">
                     <label asp-for="DoctorDegree" class="control-label"></label>
                     <select asp-for="DoctorDegree" disabled asp-items="@DoctorDegreeSelectList" class="form-control"></select>
                     <span asp-validation-for="DoctorDegree" class="text-danger"></span>
-                </div>
-                <div class="form-group col-3">
-                    <label asp-for="PhoneNumber" class="control-label"></label>
-                    <input asp-for="PhoneNumber" disabled class="form-control" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
                 <div class="offset-12 form-group mt-3 col-3">
                     <button type="button" onclick="toggle()" class="btn btn-info mr-2">
@@ -83,7 +78,7 @@
                                 <tr>
                                     <th>@item.Clinic.Region.Name</th>
                                     <th>@item.Clinic.Address</th>
-                                    <th>@item.Clinic.PhoneNumber</th>
+                                    <th>@item.Clinic.Phone1</th>
                                     <th>@item.BestTimeForVisit.StartDay</th>
                                     <th>@item.BestTimeForVisit.EndDay</th>
                                     <th>@item.BestTimeForVisit.StartTime</th>
@@ -139,7 +134,7 @@
                                     <th>@item.Hospital.Region.Name</th>
                                     <th>@item.Hospital.Name</th>
                                     <th>@item.Hospital.Address</th>
-                                    <th>@item.Hospital.PhoneNumber</th>
+                                    <th>@item.Hospital.Phone1</th>
                                     <th>@item.BestTimeForVisit.StartDay</th>
                                     <th>@item.BestTimeForVisit.EndDay</th>
                                     <th>@item.BestTimeForVisit.StartTime</th>
@@ -188,7 +183,6 @@
             doctor.Name = $("#Name").val();
             doctor.DoctorSpecialty = parseInt($("#DoctorSpecialty option:selected").val());
             doctor.DoctorDegree = parseInt($("#DoctorDegree option:selected").val());
-            doctor.PhoneNumber = $("#PhoneNumber").val();
 
             console.log(JSON.stringify(doctor));
 

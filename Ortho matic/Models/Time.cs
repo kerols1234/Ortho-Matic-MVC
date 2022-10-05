@@ -10,8 +10,8 @@ namespace Ortho_matic.Models
         public string StartTime { get; set; }
         public string EndTime { get; set; }
         [Required]
-        public DayOfWeekInArabic StartDay { get; set; }
-        public DayOfWeekInArabic EndDay { get; set; }
+        public DaysOfWeek StartDay { get; set; }
+        public DaysOfWeek EndDay { get; set; }
 
         public override bool Equals(object obj)
         {

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Ortho_matic.Data;
 using Ortho_matic.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace Ortho_matic.Controllers
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> GetAllTasks()
+        public IActionResult GetAllTasks()
         {
             try
             {
@@ -37,14 +38,14 @@ namespace Ortho_matic.Controllers
 
                 if (claim == null)
                 {
-                    return Ok(new { success = false, message = "Wrong User" });
+                    return BadRequest("Wrong User");
                 }
 
                 var user = _context.ApplicationUsers.Include(obj => obj.Region).FirstOrDefault(obj => obj.UserName == claim.Value);
 
                 if (user == null)
                 {
-                    return Ok(new { success = false, message = "Wrong Username" });
+                    return BadRequest("Wrong Username");
                 }
 
                 var doneTasks = _context.Visitations.Where(obj => obj.UserId == user.Id
@@ -55,10 +56,10 @@ namespace Ortho_matic.Controllers
                     .Where(obj => obj.Region.Name == user.Region.Name && !doneTasks.Any(t => t.ClinicId == obj.Id))
                     .Select(obj => new
                     {
-                        obj.Latitude,
-                        obj.Longitude,
                         obj.Address,
-                        obj.PhoneNumber,
+                        obj.Phone1,
+                        obj.Phone2,
+                        obj.Phone3,
                         obj.Id,
                         Doctors = obj.DoctorClinics.Select(d => new
                         {
@@ -75,10 +76,10 @@ namespace Ortho_matic.Controllers
                     .Where(obj => obj.Region.Name == user.Region.Name && !doneTasks.Any(t => t.HospitalId == obj.Id))
                     .Select(obj => new
                     {
-                        obj.Latitude,
-                        obj.Longitude,
                         obj.Address,
-                        obj.PhoneNumber,
+                        obj.Phone1,
+                        obj.Phone2,
+                        obj.Phone3,
                         obj.Id,
                         obj.Name,
                         Doctors = obj.DoctorHospitals.Select(d => new
@@ -94,24 +95,19 @@ namespace Ortho_matic.Controllers
 
                 return Ok(new
                 {
-                    success = true,
-                    message = "successful operation",
-                    data = new { clinics, hospitals }
+                    clinics = clinics,
+                    hospitals = hospitals
                 });
             }
             catch (Exception e)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = e.Message,
-                });
+                return BadRequest(e.Message);
             }
         }
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> DoneVisit([FromBody] VisitTask task)
+        public IActionResult DoneVisit([FromBody] VisitTask task)
         {
             try
             {
@@ -119,19 +115,19 @@ namespace Ortho_matic.Controllers
 
                 if (claim == null)
                 {
-                    return Ok(new { success = false, message = "Wrong User" });
+                    return BadRequest("Wrong User");
                 }
 
                 var user = _context.ApplicationUsers.Include(obj => obj.Region).FirstOrDefault(obj => obj.UserName == claim.Value);
 
                 if (user == null)
                 {
-                    return Ok(new { success = false, message = "Wrong Username" });
+                    return BadRequest("Wrong Username");
                 }
 
                 if ((task.ClinicId == null && task.HospitalId == null) || (task.ClinicId != null && task.HospitalId != null))
                 {
-                    return Ok(new { success = false, message = "Wrong must submit clinic or hospital" });
+                    return BadRequest("Wrong must submit clinic or hospital");
                 }
 
                 var visit = new Visitation()
@@ -149,19 +145,11 @@ namespace Ortho_matic.Controllers
                 _context.Visitations.Add(visit);
                 _context.SaveChanges();
 
-                return Ok(new
-                {
-                    success = true,
-                    message = "successful operation",
-                });
+                return Ok("successful operation");
             }
             catch (Exception e)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = e.Message,
-                });
+                return BadRequest(e.Message);
             }
         }
     }
