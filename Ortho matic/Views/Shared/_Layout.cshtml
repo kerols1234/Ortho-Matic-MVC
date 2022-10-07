@@ -39,7 +39,7 @@
                     </div>
                     <div class="sidebar">
                         <a asp-controller="Home" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "active" : "")" asp-action="Index">
-                            <span class="material-icons-sharp"> grid_view</span>
+                            <span class="material-icons-sharp">grid_view</span>
                             <h3>Home</h3>
                         </a>
                         <a asp-controller="Doctors" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Doctors" ? "active" : "")" asp-action="Index">
@@ -54,27 +54,22 @@
                             <span class="material-icons-sharp">emergency</span>
                             <h3>Clinics</h3>
                         </a>
-                        <a asp-controller="Storage" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Storage" ? "active" : "")" asp-action="Index">
-                            <span class="material-icons-sharp">storage</span>
-                            <h3>schedule</h3>
+                        <a asp-controller="Administrators" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administrators" ? "active" : "")" asp-action="Index">
+                            <span class="material-icons-sharp">event_repeat</span>
+                            <h3>Administrators</h3>
                         </a>
-                        <a asp-controller="Report" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "report" ? "active" : "")" asp-action="Index">
+                        <a asp-controller="Visitations" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Visitations" ? "active" : "")" asp-action="Index">
                             <span class="material-icons-sharp">event_repeat</span>
                             <h3>Month Report</h3>
                         </a>
                         <a asp-controller="Regions" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Regions" ? "active" : "")" asp-action="Index">
                             <span class="material-icons-sharp">store</span>
-                            <h3>Regions</h3>
+                            <h3>Areas</h3>
                         </a>
                         <a asp-controller="Account" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Account" ? "active" : "")" asp-action="Index">
                             <span class="material-icons-sharp">manage_accounts</span>
                             <h3>Users</h3>
                         </a>
-                        <a asp-controller="products" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Product" ? "active" : "")" asp-action="Index">
-                            <span class="material-icons-sharp">store</span>
-                            <h3>My products</h3>
-                        </a>
-
                         <a asp-controller="Account" asp-action="LogOff">
                             <span class="material-icons-sharp">logout</span>
                             <h3>Logout</h3>

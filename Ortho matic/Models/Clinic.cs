@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,6 +31,8 @@ namespace Ortho_matic.Models
         public virtual ICollection<DoctorClinic> DoctorClinics { get; set; }
         public int? RegionId { get; set; }
         [ForeignKey("RegionId")]
+        [Display(Name = "Area")]
         public virtual Region Region { get; set; }
+        public DateTime LastTimeOfVisitation { get; set; } = DateTime.Now.Subtract(TimeSpan.FromHours(49));
     }
 }

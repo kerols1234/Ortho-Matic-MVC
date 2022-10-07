@@ -104,6 +104,12 @@ namespace Ortho_matic
                     var r = roleManager.CreateAsync(admin).Result;
                 }
 
+                if (!context.Roles.Any(role => role.Name == "SubAdmin"))
+                {
+                    var admin = new IdentityRole("SubAdmin");
+                    var r = roleManager.CreateAsync(admin).Result;
+                }
+
                 if (!context.Roles.Any(role => role.Name == "Staff"))
                 {
                     var staff = new IdentityRole("Staff");

@@ -24,12 +24,14 @@ namespace Ortho_matic.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ApplicationDbContext _db;
         private readonly IConfiguration _config;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext db, IConfiguration config)
+        public AccountController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext db, IConfiguration config)
         {
+            _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
             _db = db;
@@ -63,6 +65,7 @@ namespace Ortho_matic.Controllers
             model.EmployeeName = user.EmployeeName;
             model.PhoneNumber = user.PhoneNumber;
             model.RegionId = user.RegionId;
+            model.UserRole = (await _userManager.GetRolesAsync(user))[0];
 
             ViewBag.Regions = _db.Regions.ToList();
 
@@ -75,6 +78,8 @@ namespace Ortho_matic.Controllers
         {
             if (ModelState.IsValid)
             {
+                var loginUser = await _userManager.GetUserAsync(User);
+
                 IdentityResult result;
 
                 var oldUser = await _userManager.FindByIdAsync(model.Id) as ApplicationUser;
@@ -85,10 +90,36 @@ namespace Ortho_matic.Controllers
                     RedirectToAction(nameof(Index));
                 }
 
+                if (await _userManager.IsInRoleAsync(oldUser, "Admin") && await _userManager.IsInRoleAsync(loginUser, "SubAdmin"))
+                {
+                    ModelState.AddModelError(string.Empty, "can not change admin");
+                    return View(model);
+                }
+
+                if (await _userManager.IsInRoleAsync(oldUser, "SubAdmin") && await _userManager.IsInRoleAsync(loginUser, "SubAdmin") && oldUser.Id != loginUser.Id)
+                {
+                    ModelState.AddModelError(string.Empty, "can not change user have the same role");
+                    return View(model);
+                }
+
+                if (model.UserRole == "SubAdmin" && await _userManager.IsInRoleAsync(loginUser, "SubAdmin"))
+                {
+                    ModelState.AddModelError(string.Empty, "can not change user role to this role");
+                    model.UserRole = "SubAdmin";
+                    return View(model);
+                }
+
                 if (await _userManager.IsInRoleAsync(oldUser, "Admin") && model.Name != "admin")
                 {
                     ModelState.AddModelError(string.Empty, "can not change user name of admin");
                     return View(model);
+                }
+
+                if (await _userManager.IsInRoleAsync(oldUser, "Admin"))
+                {
+                    var oldRole = await _userManager.GetRolesAsync(loginUser);
+                    await _userManager.RemoveFromRoleAsync(oldUser, oldRole[0]);
+                    await _userManager.AddToRoleAsync(oldUser, model.UserRole);
                 }
 
                 if (model.Password != null && model.Password.Trim() != "")
@@ -155,6 +186,9 @@ namespace Ortho_matic.Controllers
         {
             if (ModelState.IsValid)
             {
+                var loginUser = await _userManager.GetUserAsync(User);
+                var loginRole = (await _userManager.GetRolesAsync(loginUser))[0];
+
                 var user = new ApplicationUser
                 {
                     UserName = model.Name,
@@ -164,7 +198,24 @@ namespace Ortho_matic.Controllers
                     RegionId = model.RegionId
                 };
 
+                if (loginRole == "Staff")
+                {
+                    ModelState.AddModelError(string.Empty, "can add users");
+                    ViewBag.Regions = _db.Regions.ToList();
+                    return View(model);
+                }
+
                 var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (loginRole == "Admin")
+                {
+                    await _userManager.AddToRoleAsync(user, model.UserRole);
+                }
+
+                if (loginRole == "SubAdmin")
+                {
+                    await _userManager.AddToRoleAsync(user, "Staff");
+                }
 
                 if (result.Succeeded)
                 {
@@ -192,9 +243,17 @@ namespace Ortho_matic.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (model.UserName != "admin")
+                var user = await _db.ApplicationUsers.FirstOrDefaultAsync(obj => obj.UserName == model.UserName);
+
+                if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "only Admin can login");
+                    ModelState.AddModelError(string.Empty, "Invalid userName.");
+                    return View(model);
+                }
+
+                if (await _userManager.IsInRoleAsync(user, "Staff"))
+                {
+                    ModelState.AddModelError(string.Empty, "can not login.");
                     return View(model);
                 }
 
@@ -231,28 +290,51 @@ namespace Ortho_matic.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
+            var loginUser = await _userManager.GetUserAsync(User);
+            var loginRole = (await _userManager.GetRolesAsync(loginUser))[0];
+
+            var list = await _db.ApplicationUsers.Select(obj => new InsertVM()
+            {
+                Id = obj.Id,
+                Email = obj.Email,
+                EmployeeName = obj.EmployeeName,
+                Name = obj.UserName,
+                PhoneNumber = obj.PhoneNumber,
+                Region = obj.Region != null ? obj.Region.Name : "no area selected",
+            }).ToListAsync();
+
+            if(loginRole != "Admin")
+            {
+                list.Remove(list.First(obj => obj.Name == "admin"));
+            }
+
             return Json(new
             {
-                data = await _db.ApplicationUsers.Select(obj => new InsertVM()
-                {
-                    Id = obj.Id,
-                    Email = obj.Email,
-                    EmployeeName = obj.EmployeeName,
-                    Name = obj.UserName,
-                    PhoneNumber = obj.PhoneNumber,
-                    Region = obj.Region != null ? obj.Region.Name : "no region selected",
-                }).ToListAsync()
+                data = list,
             });
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteUser(string id)
         {
+            var loginUser = await _userManager.GetUserAsync(User);
+            var loginRole = (await _userManager.GetRolesAsync(loginUser))[0];
+
             var user = await _db.ApplicationUsers.FirstOrDefaultAsync(obj => obj.Id == id);
+
             if (user == null)
             {
                 return Json(new { success = false, message = "No user with this id" });
             }
+            if (user.Id == loginUser.Id)
+            {
+                return Json(new { success = false, message = "can not delete your self" });
+            }
+            if (loginRole == "SubAdmin" && await _userManager.IsInRoleAsync(user, "SubAdmin"))
+            {
+                return Json(new { success = false, message = "can not delete user have same role" });
+            }
+
             if (user.UserName == "admin")
             {
                 return Json(new { success = false, message = "Can not delete admin" });

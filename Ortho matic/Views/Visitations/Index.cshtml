@@ -1,0 +1,88 @@
+﻿@{
+    var list = new List<SelectListItem>() {
+                new SelectListItem
+                         {
+                             Text = "Clinic",
+                             Value = "Clinic",
+                         },
+                new SelectListItem
+                        {
+                            Text = "Hospital",
+                            Value = "Hospital",
+                        },
+            };
+    var initTime = DateTime.Now.ToString("yyyy-MM-");
+}
+
+<div class="row" style="width:100%">
+    <div class="col-12 pb-4">
+        <div class="card custom-card">
+            <div class="card-header bg-white">
+                <h4>Search</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-3">
+                        <label for="user">User name</label>
+                        <input id="user" class="form-control" />
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="doctor">Doctor name</label>
+                        <input id="doctor" class="form-control" />
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="time">Time</label>
+                        <input id="time" value="@initTime" class="form-control" />
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="type">Type</label>
+                        <select id="type" asp-items="@list" class="form-control">
+                            <option selected value="">No Type</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card custom-card">
+            <div class="card-header row bg-white m-0">
+                <div class="col-6">
+                    <h4 class="text-info">Visits</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table" id="DT_load">
+                    <thead>
+                        <tr>
+                            <th scope="col">User</th>
+                            <th scope="col">Doctor</th>
+                            <th scope="col">Time</th>
+                            <th scope="col">Type</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tfoot hidden>
+                        <tr>
+                            <th>user</th>
+                            <th>doctor</th>
+                            <th>time</th>
+                            <th>type</th>
+                            <th>Button</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/visit.js" asp-append-version="true"></script>
+}

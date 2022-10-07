@@ -91,7 +91,7 @@ namespace Ortho_matic.Controllers
                 data = await _context.Clinics.Include(obj => obj.DoctorClinics).Select(obj => new
                 {
                     Id = obj.Id,
-                    Region = obj.Region != null ? obj.Region.Name : "no region selected",
+                    Region = obj.Region != null ? obj.Region.Name : "no aree selected",
                     Phone1 = obj.Phone1,
                     Address = obj.Address,
                     NumberOfDoctors = obj.DoctorClinics.Count()

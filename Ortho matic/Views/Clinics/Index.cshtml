@@ -1,7 +1,7 @@
 ﻿@model Clinic
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Clinics";
     SelectList regionLst = new SelectList(ViewBag.Regions, "Id", "Name");
 }
 
@@ -54,9 +54,9 @@
                     <thead>
                         <tr>
                             <th scope="col">Id</th>
-                            <th scope="col">Region</th>
+                            <th scope="col">Area</th>
                             <th scope="col">PhoneNumber</th>
-                            <th scope="col">Adress</th>
+                            <th scope="col">Address</th>
                             <th scope="col">Number of doctors</th>
                             <th scope="col"></th>
                         </tr>

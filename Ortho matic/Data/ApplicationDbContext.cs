@@ -27,5 +27,6 @@ namespace Ortho_matic.Data
         public DbSet<Time> Times { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<Visitation> Visitations { get; set; }
+        public DbSet<Administrator> Administrators { get; set; }
     }
 }

@@ -110,7 +110,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/t.js" asp-append-version="true"></script>
     <script type="text/javascript">
 
         function toggle() {
@@ -127,7 +126,7 @@
             hospital.Name = $("#Name").val();
             hospital.Address = $("#Address").val();
             hospital.Phone1 = $("#Phone1").val();
-            if($("#Phone2").val() != "")
+            if ($("#Phone2").val() != "")
                 hospital.Phone2 = $("#Phone2").val();
             if ($("#Phone3").val() != "")
                 hospital.Phone3 = $("#Phone3").val();

@@ -31,5 +31,6 @@ namespace Ortho_matic.Models.ViewModels
         public string EmployeeName { get; set; }
         public int? RegionId { get; set; }
         public string Region { get; set; }
+        public string UserRole { get; set; }
     }
 }

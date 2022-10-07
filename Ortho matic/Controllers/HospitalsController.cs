@@ -92,7 +92,7 @@ namespace Ortho_matic.Controllers
                 {
                     obj.Id,
                     obj.Name,
-                    Region = obj.Region != null ? obj.Region.Name : "no region selected",
+                    Region = obj.Region != null ? obj.Region.Name : "no area selected",
                     obj.Address,
                     obj.Phone1,
                     NumberOfDoctors = obj.DoctorHospitals.Count()

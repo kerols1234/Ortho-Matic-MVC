@@ -1,0 +1,138 @@
+﻿@model Administrator
+
+@{
+    ViewData["Title"] = "Details";
+    SelectList regionLst = new SelectList(ViewBag.Regions, "Id", "Name", Model.RegionId ?? -1);
+}
+
+<div class="row" style="width:100%">
+    <div class="col-12 pb-2">
+        <div class="card custom-card">
+            <div class="row">
+                <input asp-for="Id" hidden class="form-control" type="text">
+                <div class="form-group col-4">
+                    <label asp-for="Name"></label>
+                    <input disabled asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group col-4">
+                    <label asp-for="PhoneNumber"></label>
+                    <input disabled asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group col-4">
+                    <label asp-for="Specialty"></label>
+                    <input disabled asp-for="Specialty" class="form-control" />
+                    <span asp-validation-for="Specialty" class="text-danger"></span>
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="Region"></label>
+                    <select disabled asp-for="RegionId" asp-items="regionLst" class="form-control">
+                        <option value="-1">no region selected</option>
+                    </select>
+                    <span id="Region" asp-validation-for="Region" class="text-danger"></span>
+                </div>
+                <div class="form-group col-9">
+                    <label asp-for="Comments"></label>
+                    <input disabled asp-for="Comments" class="form-control" />
+                    <span asp-validation-for="Comments" class="text-danger"></span>
+                </div>
+                <div class="form-group mt-3 col-9">
+                    <button type="button" onclick="toggle()" class="btn btn-info mr-2">
+                        Edit
+                    </button>
+                    <button type="button" hidden onclick="saveChanges()" class="btn btn-info mr-2">
+                        Save
+                    </button>
+                    <button type="button" hidden onclick="toggle()" class="btn btn-warning text-white">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+
+        function toggle() {
+            $("input").prop('disabled', (i, v) => !v);
+            $("select").prop('disabled', (i, v) => !v);
+            $("button").prop('hidden', (i, v) => !v);
+        }
+
+        function saveChanges() {
+
+            var administrator = {};
+
+            administrator.Id = @Model.Id;
+            administrator.Name = $("#Name").val();
+            administrator.PhoneNumber = $("#PhoneNumber").val();
+            if ($("#Comments").val() != "")
+                administrator.Comments = $("#Comments").val();
+            if ($("#Specialty").val() != "")
+                administrator.Specialty = $("#Specialty").val();
+            administrator.regionId = parseInt($("#RegionId option:selected").val());
+
+            if (administrator.regionId == -1) {
+                console.log("e");
+                $("#Region").text("must select region");
+                return;
+            } else {
+                $("#Region").text('');
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Administrators/Update",
+                data: JSON.stringify(administrator),
+                contentType: "application/json; charset=utf-8",
+                traditional: true,
+                dataType: "json",
+                success: function (data) {
+                    if (data.success) {
+                        toastr.success(data.message);
+                        toggle();
+                    }
+                    else {
+                        toastr.error(data.message);
+                    }
+                }
+            });
+        }
+
+        function Delete(url, button, table_name) {
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        type: "DELETE",
+                        url: url,
+                        success: function (data) {
+                            if (data.success) {
+                                toastr.success(data.message);
+                                var row = $(button).closest("TR");
+                                var table = $('#' + table_name)[0];
+                                table.deleteRow(row[0].rowIndex);
+                            }
+                            else {
+                                toastr.error(data.message);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+}
+
