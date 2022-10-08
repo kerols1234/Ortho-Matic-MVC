@@ -15,6 +15,7 @@ namespace Ortho_matic.Models
         [RegularExpression(@"^01([0-9]{9})", ErrorMessage = "Invalid Mobile Number")]
         public string PhoneNumber { get; set; }
         public string Specialty { get; set; }
+        [DataType(DataType.MultilineText)]
         public string Comments { get; set; }
         public int? RegionId { get; set; }
         [ForeignKey("RegionId")]

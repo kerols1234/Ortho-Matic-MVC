@@ -1,16 +1,20 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.ExtendedProperties;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using Ortho_matic.Data;
 using Ortho_matic.Models;
 using Ortho_matic.Models.APIModels;
 using Ortho_matic.Models.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,9 +25,10 @@ namespace Ortho_matic.Controllers
     public class VisitationsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public VisitationsController(ApplicationDbContext context)
+        private readonly UserManager<IdentityUser> _userManager;
+        public VisitationsController(UserManager<IdentityUser> userManager, ApplicationDbContext context)
         {
+            _userManager = userManager;
             _context = context;
         }
 
@@ -41,7 +46,7 @@ namespace Ortho_matic.Controllers
                 {
                     user = obj.User.EmployeeName,
                     doctor = obj.Doctor.Name,
-                    date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(obj.TimeOfVisit, "Egypt Standard Time").ToString("dd-MM-yyyy hh:mm tt"),
+                    date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(obj.TimeOfVisit, "Egypt Standard Time").ToString("yyyy-MM-dd hh:mm tt"),
                     type = obj.ClinicId == null ? "Hospital" : "Clinic",
                     obj.Id,
                 }).ToListAsync()
@@ -59,12 +64,12 @@ namespace Ortho_matic.Controllers
                 .Select(obj => new TaskVM
                 {
                     Id = obj.Id,
-                    UserName = obj.User.EmployeeName,
+                    UserName = obj.User.UserName,
                     comment = obj.comment,
                     Latitude = obj.Latitude,
                     Longitude = obj.Longitude,
                     DoctorName = obj.Doctor.Name,
-                    TimeOfVisit = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(obj.TimeOfVisit, "Egypt Standard Time").ToString("dd-MM-yyyy hh:mm tt"),
+                    TimeOfVisit = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(obj.TimeOfVisit, "Egypt Standard Time").ToString("yyyy-MM-dd hh:mm tt"),
                     Type = obj.ClinicId == null ? "Hospital" : "Clinic",
                     DoctorDegree = obj.Doctor.DoctorDegree.ToString(),
                     DoctorSpecialty = obj.Doctor.DoctorSpecialty.ToString(),
@@ -211,6 +216,20 @@ namespace Ortho_matic.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetDataToExcelSheet()
+        {
+            ViewBag.Users = await _userManager.GetUsersInRoleAsync("Staff");
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult GetExcelSheet(ExcelVM model)
+        {
+            var visits = GetVisitsDetail(model);
+            return ExportToExcel(visits);
+        }
+
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult DoneVisit([FromBody] VisitTask task)
@@ -258,7 +277,7 @@ namespace Ortho_matic.Controllers
                     _context.Clinics.Update(clinic);
                 }
 
-                if (task.HospitalId == null)
+                if (task.HospitalId != null)
                 {
                     var hospital = _context.Hospitals.Find(task.HospitalId);
                     hospital.LastTimeOfVisitation = DateTime.Now;
@@ -272,6 +291,75 @@ namespace Ortho_matic.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        private IActionResult ExportToExcel(DataTable visits)
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Visits");
+                var currentRow = 1;
+
+                worksheet.Cell(currentRow, 1).Value = "UserName";
+                worksheet.Cell(currentRow, 2).Value = "TimeOfVisit";
+                worksheet.Cell(currentRow, 3).Value = "Address";
+                worksheet.Cell(currentRow, 4).Value = "Doctor name";
+                worksheet.Cell(currentRow, 5).Value = "Type";
+                worksheet.Cell(currentRow, 6).Value = "Comment";
+
+                for (int i = 0; i < visits.Rows.Count; i++)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = visits.Rows[i]["UserName"];
+                    worksheet.Cell(currentRow, 2).Value = visits.Rows[i]["TimeOfVisit"];
+                    worksheet.Cell(currentRow, 3).Value = visits.Rows[i]["Address"];
+                    worksheet.Cell(currentRow, 4).Value = visits.Rows[i]["Doctor name"];
+                    worksheet.Cell(currentRow, 5).Value = visits.Rows[i]["Type"];
+                    worksheet.Cell(currentRow, 6).Value = visits.Rows[i]["Comment"];
+                }
+
+                using var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                return File(
+                    stream.ToArray(),
+                    "application/xlsx",
+                    "ExcelFile.xlsx");
+            }
+        }
+
+        private DataTable GetVisitsDetail(ExcelVM model)
+        {
+            DataTable dtVisit = new DataTable("VisitDetails");
+            dtVisit.Columns.AddRange(new DataColumn[6] { new DataColumn("UserName"),
+                                            new DataColumn("TimeOfVisit"),
+                                            new DataColumn("Address"),
+                                            new DataColumn("Doctor name"),
+                                            new DataColumn("Type"),
+                                            new DataColumn("Comment"),
+
+            });
+            var visits = _context.Visitations
+                .Include(obj => obj.User)
+                .Include(obj => obj.Doctor)
+                .Include(obj => obj.Hospital)
+                .Include(obj => obj.Clinic)
+                .Where(obj => obj.User.UserName == model.UserName && obj.TimeOfVisit > model.StartTime && obj.TimeOfVisit < model.EndTime)
+                .ToList();
+
+            foreach(var visit in visits)
+            {
+                var time = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(visit.TimeOfVisit, "Egypt Standard Time").ToString("yyyy-MM-dd hh:mm tt");
+                dtVisit.Rows.Add(
+                    visit.User.UserName,
+                    time,
+                    visit.HospitalId == null ? visit.Clinic.Address : visit.Hospital.Address,
+                    visit.Doctor.Name,
+                    visit.HospitalId == null ? "Clinic" : "Hospital",
+                    visit.comment
+                    );
+            }
+
+            return dtVisit;
         }
     }
 }

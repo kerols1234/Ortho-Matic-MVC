@@ -20,7 +20,7 @@ namespace Ortho_matic.Controllers
 
         public IActionResult Index(int? id)
         {
-            Administrator administrator = new Administrator() { Name = ""};
+            Administrator administrator = new Administrator() { Name = "" };
 
             if (id != null)
             {
@@ -32,48 +32,23 @@ namespace Ortho_matic.Controllers
             return View(administrator);
         }
 
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-
-            var administrator = await _context.Administrators
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (administrator == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.Regions = _context.Regions.ToList();
-
-            return View(administrator);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult insert(Administrator model)
+        public IActionResult Upsert(Administrator model)
         {
             if (ModelState.IsValid)
             {
-                _context.Administrators.Add(model);
+                if (model.Id != 0)
+                {
+                    _context.Administrators.Update(model);
+                }
+                else
+                {
+                    _context.Administrators.Add(model);
+                }
                 _context.SaveChanges();
             }
             return Redirect(nameof(Index));
-        }
-
-        [HttpPost]
-        public IActionResult Update([FromBody] Administrator model)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Administrators.Update(model);
-                _context.SaveChanges();
-                return Json(new { success = true, message = "update successfull" });
-            }
-            return Json(new { success = false, message = ModelState.Values });
         }
 
         [HttpGet]

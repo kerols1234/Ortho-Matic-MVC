@@ -21,7 +21,7 @@ function loadDataTable() {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">
-                        <a href="/Visitation/Details?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
+                        <a href="/Visitations/Details?id=${data}" class='btn btn-success text-white' style='cursor:pointer;'>
                             <i class="fa fa-book"></i>
                         </a>`;
                 }, "width": "15%"
