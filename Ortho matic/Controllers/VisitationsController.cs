@@ -322,8 +322,12 @@ namespace Ortho_matic.Controllers
         [HttpPost]
         public IActionResult GetExcelSheet(ExcelVM model)
         {
-            var visits = GetVisitsDetail(model);
-            return ExportToExcel(visits);
+            if (ModelState.IsValid)
+            {
+                var visits = GetVisitsDetail(model);
+                return ExportToExcel(visits);
+            }
+            return View(model);
         }
 
         private IActionResult ExportToExcel(DataTable visits)
@@ -379,7 +383,7 @@ namespace Ortho_matic.Controllers
                 .Where(obj => obj.User.UserName == model.UserName && obj.TimeOfVisit > model.StartTime && obj.TimeOfVisit < model.EndTime)
                 .ToList();
 
-            foreach(var visit in visits)
+            foreach (var visit in visits)
             {
                 var time = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(visit.TimeOfVisit, "Egypt Standard Time").ToString("yyyy-MM-dd hh:mm tt");
                 dtVisit.Rows.Add(
