@@ -91,7 +91,88 @@ namespace Ortho_matic.Controllers
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult GetAllTasks()
+        public IActionResult GetAllTasksOfHospitals()
+        {
+            try
+            {
+                var claim = User.Claims.FirstOrDefault(obj => obj.Type == "UserName");
+
+                if (claim == null)
+                {
+                    return BadRequest("Wrong User");
+                }
+
+                var user = _context.ApplicationUsers.Include(obj => obj.Region).FirstOrDefault(obj => obj.UserName == claim.Value);
+
+                if (user == null)
+                {
+                    return BadRequest("Wrong Username");
+                }
+
+                var lowerB = DateTime.Now.Subtract(TimeSpan.FromHours(48));
+
+                var hospitals = _context.Hospitals
+                    .Where(obj => obj.Region.Name == user.Region.Name && obj.LastTimeOfVisitation < lowerB)
+                    .Select(obj => new
+                    {
+                        obj.Address,
+                        obj.Phone1,
+                        obj.Phone2,
+                        obj.Phone3,
+                        obj.Id,
+                        obj.Name,
+                        Doctors = obj.DoctorHospitals.Select(d => new
+                        {
+                            obj.Id,
+                            DoctorName = d.Doctor.Name,
+                            d.Doctor.DoctorSpecialty,
+                            d.Doctor.DoctorDegree,
+                            d.BestTimeForVisit,
+                            d.Times,
+                        }),
+                    }).ToList();
+
+                var listOfHospitals = new List<HospitalTask>();
+
+                foreach (var item in hospitals)
+                {
+                    var hospital = new HospitalTask()
+                    {
+                        HospitalId = item.Id,
+                        HospitalAddress = item.Address,
+                        HospitalPhone1 = item.Phone1,
+                        HospitalPhone2 = item.Phone2,
+                        HospitalPhone3 = item.Phone3,
+                        HospitalName = item.Name
+                    };
+
+                    foreach (var doc in item.Doctors)
+                    {
+                        hospital.DoctorId = doc.Id;
+                        hospital.DoctorName = doc.DoctorName;
+                        hospital.DoctorDegree = doc.DoctorDegree;
+                        hospital.DoctorSpecialty = doc.DoctorSpecialty;
+                        hospital.BestTimeForVisit = doc.BestTimeForVisit;
+                        hospital.Times = doc.Times;
+
+                        listOfHospitals.Add(hospital);
+                    }
+                }
+
+                return Ok(new
+                {
+                    hospitals = listOfHospitals
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult GetAllTasksOfClinics()
         {
             try
             {
@@ -131,29 +212,7 @@ namespace Ortho_matic.Controllers
                         }),
                     }).ToList();
 
-                var hospitals = _context.Hospitals
-                    .Where(obj => obj.Region.Name == user.Region.Name && obj.LastTimeOfVisitation < lowerB)
-                    .Select(obj => new
-                    {
-                        obj.Address,
-                        obj.Phone1,
-                        obj.Phone2,
-                        obj.Phone3,
-                        obj.Id,
-                        obj.Name,
-                        Doctors = obj.DoctorHospitals.Select(d => new
-                        {
-                            obj.Id,
-                            DoctorName = d.Doctor.Name,
-                            d.Doctor.DoctorSpecialty,
-                            d.Doctor.DoctorDegree,
-                            d.BestTimeForVisit,
-                            d.Times,
-                        }),
-                    }).ToList();
-
                 var listOfClinics = new List<ClinicTask>();
-                var listOfHospitals = new List<HospitalTask>();
 
                 foreach (var item in clinics)
                 {
@@ -179,55 +238,15 @@ namespace Ortho_matic.Controllers
                     }
                 }
 
-                foreach (var item in hospitals)
-                {
-                    var hospital = new HospitalTask()
-                    {
-                        HospitalId = item.Id,
-                        HospitalAddress = item.Address,
-                        HospitalPhone1 = item.Phone1,
-                        HospitalPhone2 = item.Phone2,
-                        HospitalPhone3 = item.Phone3,
-                        HospitalName = item.Name
-                    };
-
-                    foreach (var doc in item.Doctors)
-                    {
-                        hospital.DoctorId = doc.Id;
-                        hospital.DoctorName = doc.DoctorName;
-                        hospital.DoctorDegree = doc.DoctorDegree;
-                        hospital.DoctorSpecialty = doc.DoctorSpecialty;
-                        hospital.BestTimeForVisit = doc.BestTimeForVisit;
-                        hospital.Times = doc.Times;
-
-                        listOfHospitals.Add(hospital);
-                    }
-                }
-
                 return Ok(new
                 {
                     clinics = listOfClinics,
-                    hospitals = listOfHospitals
                 });
             }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetDataToExcelSheet()
-        {
-            ViewBag.Users = await _userManager.GetUsersInRoleAsync("Staff");
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult GetExcelSheet(ExcelVM model)
-        {
-            var visits = GetVisitsDetail(model);
-            return ExportToExcel(visits);
         }
 
         [HttpPost]
@@ -291,6 +310,20 @@ namespace Ortho_matic.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDataToExcelSheet()
+        {
+            ViewBag.Users = await _userManager.GetUsersInRoleAsync("Staff");
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult GetExcelSheet(ExcelVM model)
+        {
+            var visits = GetVisitsDetail(model);
+            return ExportToExcel(visits);
         }
 
         private IActionResult ExportToExcel(DataTable visits)

@@ -114,5 +114,38 @@ namespace Ortho_matic.Controllers
             return BadRequest(ModelState.Values.ToString());
         }
 
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult GetAllAdministratorsMobile()
+        {
+            var claim = User.Claims.FirstOrDefault(obj => obj.Type == "UserName");
+
+            if (claim == null)
+            {
+                return BadRequest("Wrong User");
+            }
+
+            var user = _context.ApplicationUsers.FirstOrDefault(obj => obj.UserName == claim.Value);
+
+            if (user == null)
+            {
+                return BadRequest("This user doe not exist");
+            }
+
+            var list = _context
+                .Administrators
+                .Where(obj => obj.RegionId == user.RegionId)
+                .Select(obj => new
+                {
+                    obj.Name,
+                    obj.PhoneNumber,
+                    obj.Specialty,
+                    obj.Comments,
+                    obj.Id
+                })
+                .ToList();
+
+            return Ok(list);
+        }
     }
 }
