@@ -11,7 +11,7 @@ function loadDataTable() {
             "type": "GET",
             "datatype": "json"
         },
-        "dom": "tr",
+        "dom": 'lrtip',
         "columns": [
             { "data": "user" },
             { "data": "doctor" },

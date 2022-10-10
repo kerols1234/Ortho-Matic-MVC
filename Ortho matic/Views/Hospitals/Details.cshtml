@@ -78,7 +78,7 @@
                             {
                                 <tr>
                                     <th>@item.Doctor.Name</th>
-                                    <th>@item.Doctor.DoctorSpecialty</th>
+                                    <th>@item.Doctor.DoctorSpecialty.ToString().Replace('_',' ')</th>
                                     <th>@item.BestTimeForVisit.StartDay</th>
                                     <th>@item.BestTimeForVisit.EndDay</th>
                                     <th>@item.BestTimeForVisit.StartTime</th>

@@ -141,7 +141,7 @@ namespace Ortho_matic.Controllers
                     obj.PhoneNumber,
                     obj.Specialty,
                     obj.Comments,
-                    obj.Id
+                    obj.Id,
                 })
                 .ToList();
 

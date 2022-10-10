@@ -9,7 +9,7 @@
             }).AsQueryable();
     var DoctorSpecialtySelectList = Enum.GetNames(typeof(Specialty)).Select((i, c) => new SelectListItem
             {
-                Text = i.ToString(),
+                Text = i.ToString().Replace('_', ' '),
                 Value = c.ToString(),
             }).AsQueryable();
 }

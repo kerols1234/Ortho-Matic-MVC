@@ -17,10 +17,10 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
-<body style="margin:0">
+<body style="margin:0" class="@(!SignInManager.IsSignedIn(User) ? "bg-image" : "")">
     @if (!SignInManager.IsSignedIn(User))
     {
-        <div class="container-fluid bg-light d-flex" style="min-height:70vh;">
+        <div class="container-fluid d-flex" style="min-height:70vh;">
             <div class="row col">
                 @RenderBody()
             </div>
@@ -33,8 +33,7 @@
                 <aside class="col-2 p-3">
                     <div class="top">
                         <div class="logo">
-
-                            <img src="~/img/logo-03.png" />
+                            <img src="~/img/logo2.png" />
                         </div>
                     </div>
                     <div class="sidebar">
@@ -55,7 +54,7 @@
                             <h3>Clinics</h3>
                         </a>
                         <a asp-controller="Administrators" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administrators" ? "active" : "")" asp-action="Index">
-                            <span class="material-icons-sharp">event_repeat</span>
+                            <span class="material-icons-sharp">admin_panel_settings</span>
                             <h3>Administrators</h3>
                         </a>
                         <a asp-controller="Visitations" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Visitations" ? "active" : "")" asp-action="Index">
@@ -76,7 +75,7 @@
                         </a>
                     </div>
                 </aside>
-                <main role="main" class="col-10 mt-0 p-3 container ma" >
+                <main role="main" class="col-10 mt-0 p-3 container ma">
                     @RenderBody()
                 </main>
             </div>

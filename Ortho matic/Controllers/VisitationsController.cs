@@ -32,8 +32,9 @@ namespace Ortho_matic.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
+            ViewBag.Users = await _userManager.GetUsersInRoleAsync("Staff");
             return View();
         }
 
@@ -44,7 +45,7 @@ namespace Ortho_matic.Controllers
             {
                 data = await _context.Visitations.Select(obj => new
                 {
-                    user = obj.User.EmployeeName,
+                    user = obj.User.UserName,
                     doctor = obj.Doctor.Name,
                     date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(obj.TimeOfVisit, "Egypt Standard Time").ToString("yyyy-MM-dd hh:mm tt"),
                     type = obj.ClinicId == null ? "Hospital" : "Clinic",
@@ -72,7 +73,7 @@ namespace Ortho_matic.Controllers
                     TimeOfVisit = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(obj.TimeOfVisit, "Egypt Standard Time").ToString("yyyy-MM-dd hh:mm tt"),
                     Type = obj.ClinicId == null ? "Hospital" : "Clinic",
                     DoctorDegree = obj.Doctor.DoctorDegree.ToString(),
-                    DoctorSpecialty = obj.Doctor.DoctorSpecialty.ToString(),
+                    DoctorSpecialty = obj.Doctor.DoctorSpecialty.ToString().Replace('_', ' '),
                     HospitalName = obj.HospitalId == null ? null : obj.Hospital.Name,
                     HospitalAddress = obj.HospitalId == null ? null : obj.Hospital.Address,
                     HospitalPhone1 = obj.HospitalId == null ? null : obj.Hospital.Phone1,
@@ -83,7 +84,7 @@ namespace Ortho_matic.Controllers
 
             if (task == null)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
 
             return View(task);
@@ -112,7 +113,7 @@ namespace Ortho_matic.Controllers
                 var lowerB = DateTime.Now.Subtract(TimeSpan.FromHours(48));
 
                 var hospitals = _context.Hospitals
-                    .Where(obj => obj.Region.Name == user.Region.Name && obj.LastTimeOfVisitation < lowerB)
+                    .Where(obj => obj.Region.Name == user.Region.Name && obj.DoctorHospitals.Count != 0)
                     .Select(obj => new
                     {
                         obj.Address,
@@ -121,7 +122,7 @@ namespace Ortho_matic.Controllers
                         obj.Phone3,
                         obj.Id,
                         obj.Name,
-                        Doctors = obj.DoctorHospitals.Select(d => new
+                        Doctors = obj.DoctorHospitals.Where(obj => obj.LastTimeOfVisitation < lowerB).Select(d => new
                         {
                             obj.Id,
                             DoctorName = d.Doctor.Name,
@@ -193,7 +194,7 @@ namespace Ortho_matic.Controllers
                 var lowerB = DateTime.Now.Subtract(TimeSpan.FromHours(48));
 
                 var clinics = _context.Clinics
-                    .Where(obj => obj.Region.Name == user.Region.Name && obj.LastTimeOfVisitation < lowerB)
+                    .Where(obj => obj.Region.Name == user.Region.Name && obj.DoctorClinics.Count != 0)
                     .Select(obj => new
                     {
                         obj.Address,
@@ -201,7 +202,7 @@ namespace Ortho_matic.Controllers
                         obj.Phone2,
                         obj.Phone3,
                         obj.Id,
-                        Doctors = obj.DoctorClinics.Select(d => new
+                        Doctors = obj.DoctorClinics.Where(obj => obj.LastTimeOfVisitation < lowerB).Select(d => new
                         {
                             obj.Id,
                             DoctorName = d.Doctor.Name,
@@ -286,24 +287,30 @@ namespace Ortho_matic.Controllers
                     UserId = user.Id,
                 };
 
-                _context.Visitations.Add(visit);
-                _context.SaveChanges();
-
                 if (task.ClinicId != null)
                 {
-                    var clinic = _context.Clinics.Find(task.ClinicId);
-                    clinic.LastTimeOfVisitation = DateTime.Now;
+                    var clinic = _context.Clinics.Include(obj => obj.DoctorClinics).FirstOrDefault(obj => obj.Id == task.ClinicId);
+                    if (clinic.DoctorClinics.FirstOrDefault(obj => obj.DoctorId == task.DoctorId).LastTimeOfVisitation > DateTime.Now.Subtract(TimeSpan.FromHours(48)))
+                    {
+                        return BadRequest("This task done in the last two days");
+                    }
+                    clinic.DoctorClinics.FirstOrDefault(obj => obj.DoctorId == task.DoctorId).LastTimeOfVisitation = DateTime.Now;
                     _context.Clinics.Update(clinic);
                 }
-
-                if (task.HospitalId != null)
+                else
                 {
-                    var hospital = _context.Hospitals.Find(task.HospitalId);
-                    hospital.LastTimeOfVisitation = DateTime.Now;
+                    var hospital = _context.Hospitals.Include(obj => obj.DoctorHospitals).FirstOrDefault(obj => obj.Id == task.HospitalId);
+                    if (hospital.DoctorHospitals.FirstOrDefault(obj => obj.DoctorId == task.DoctorId).LastTimeOfVisitation > DateTime.Now.Subtract(TimeSpan.FromHours(48)))
+                    {
+                        return BadRequest("This task done in the last two days");
+                    }
+                    hospital.DoctorHospitals.FirstOrDefault(obj => obj.DoctorId == task.DoctorId).LastTimeOfVisitation = DateTime.Now;
                     _context.Hospitals.Update(hospital);
                 }
 
+                _context.Visitations.Add(visit);
                 _context.SaveChanges();
+
                 return Ok("successful operation");
             }
             catch (Exception e)
@@ -320,14 +327,15 @@ namespace Ortho_matic.Controllers
         }
 
         [HttpPost]
-        public IActionResult GetExcelSheet(ExcelVM model)
+        public async Task<IActionResult> GetDataToExcelSheetAsync(ExcelVM model)
         {
             if (ModelState.IsValid)
             {
                 var visits = GetVisitsDetail(model);
                 return ExportToExcel(visits);
             }
-            return View(model);
+            ViewBag.Users = await _userManager.GetUsersInRoleAsync("Staff");
+            return View();
         }
 
         private IActionResult ExportToExcel(DataTable visits)

@@ -36,7 +36,7 @@ namespace Ortho_matic.Controllers
                 }).AsQueryable(),
                 DoctorSpecialtySelectList = Enum.GetNames(typeof(Specialty)).Select(i => new SelectListItem
                 {
-                    Text = i.ToString(),
+                    Text = i.ToString().Replace('_', ' '),
                     Value = i.ToString(),
                 }).AsQueryable()
             });
@@ -162,7 +162,7 @@ namespace Ortho_matic.Controllers
                 data = await _context.Doctors.Select(obj => new
                 {
                     obj.Name,
-                    DoctorSpecialty = obj.DoctorSpecialty.ToString(),
+                    DoctorSpecialty = obj.DoctorSpecialty.ToString().Replace('_', ' '),
                     obj.Id,
                     DoctorDegree = obj.DoctorDegree.ToString(),
                 }).ToListAsync()
@@ -275,10 +275,6 @@ namespace Ortho_matic.Controllers
                 oldDoctorClinic.Times = doctorClinic.Times;
                 oldDoctorClinic.BestTimeForVisit = doctorClinic.BestTimeForVisit;
 
-                // _context.Entry(doctorClinic).State = EntityState.Detached;
-                //_context.Entry(doctorClinic.Times).State = EntityState.Detached;
-                //_context.Entry(doctorClinic.BestTimeForVisit).State = EntityState.Detached;
-
                 _context.DoctorClinics.Update(oldDoctorClinic);
                 var re = _context.SaveChanges();
             }
@@ -328,7 +324,7 @@ namespace Ortho_matic.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult AddDoctor([FromBody]Doctor model)
+        public IActionResult AddDoctor([FromBody] Doctor model)
         {
             if (ModelState.IsValid)
             {
@@ -350,8 +346,8 @@ namespace Ortho_matic.Controllers
                 {
                     return BadRequest("Doctor must contain name");
                 }
-                
-                foreach(var item in model.DoctorClinics)
+
+                foreach (var item in model.DoctorClinics)
                 {
                     item.Clinic.RegionId = user.RegionId;
                 }

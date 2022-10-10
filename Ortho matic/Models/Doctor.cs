@@ -28,8 +28,10 @@ namespace Ortho_matic.Models
 
     public enum Specialty
     {
-        Orthopedic,
-        Surgeon,
-        Physiotherapist
+        عظام_عام,
+        علاج_طبيعى,
+        اوعية_دموية,
+        جراحة_عامه,
+        مخ_واعصاب
     }
 }

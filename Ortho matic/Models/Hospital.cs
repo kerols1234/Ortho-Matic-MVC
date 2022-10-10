@@ -35,6 +35,5 @@ namespace Ortho_matic.Models
         [ForeignKey("RegionId")]
         [Display(Name = "Area")]
         public virtual Region Region { get; set; }
-        public DateTime LastTimeOfVisitation { get; set; } = DateTime.Now.Subtract(TimeSpan.FromHours(49));
     }
 }
