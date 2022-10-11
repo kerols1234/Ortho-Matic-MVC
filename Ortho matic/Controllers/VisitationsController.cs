@@ -124,7 +124,7 @@ namespace Ortho_matic.Controllers
                         obj.Name,
                         Doctors = obj.DoctorHospitals.Where(obj => obj.LastTimeOfVisitation < lowerB).Select(d => new
                         {
-                            obj.Id,
+                            d.DoctorId,
                             DoctorName = d.Doctor.Name,
                             d.Doctor.DoctorSpecialty,
                             d.Doctor.DoctorDegree,
@@ -149,7 +149,7 @@ namespace Ortho_matic.Controllers
 
                     foreach (var doc in item.Doctors)
                     {
-                        hospital.DoctorId = doc.Id;
+                        hospital.DoctorId = doc.DoctorId;
                         hospital.DoctorName = doc.DoctorName;
                         hospital.DoctorDegree = doc.DoctorDegree;
                         hospital.DoctorSpecialty = doc.DoctorSpecialty;
@@ -204,7 +204,7 @@ namespace Ortho_matic.Controllers
                         obj.Id,
                         Doctors = obj.DoctorClinics.Where(obj => obj.LastTimeOfVisitation < lowerB).Select(d => new
                         {
-                            obj.Id,
+                            d.DoctorId,
                             DoctorName = d.Doctor.Name,
                             d.Doctor.DoctorSpecialty,
                             d.Doctor.DoctorDegree,
@@ -228,7 +228,7 @@ namespace Ortho_matic.Controllers
 
                     foreach (var doc in item.Doctors)
                     {
-                        clinic.DoctorId = doc.Id;
+                        clinic.DoctorId = doc.DoctorId;
                         clinic.DoctorName = doc.DoctorName;
                         clinic.DoctorDegree = doc.DoctorDegree;
                         clinic.DoctorSpecialty = doc.DoctorSpecialty;
