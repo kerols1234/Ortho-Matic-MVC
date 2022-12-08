@@ -112,6 +112,10 @@ namespace Ortho_matic.Controllers
 
                 var lowerB = DateTime.Now.Subtract(TimeSpan.FromHours(48));
 
+                int dayOfWeek = (int)DateTime.Now.DayOfWeek;
+                dayOfWeek++;
+                dayOfWeek %= 7;
+
                 var hospitals = _context.Hospitals
                     .Where(obj => obj.Region.Name == user.Region.Name && obj.DoctorHospitals.Count != 0)
                     .Select(obj => new
@@ -122,15 +126,20 @@ namespace Ortho_matic.Controllers
                         obj.Phone3,
                         obj.Id,
                         obj.Name,
-                        Doctors = obj.DoctorHospitals.Where(obj => obj.LastTimeOfVisitation < lowerB).Select(d => new
-                        {
-                            d.DoctorId,
-                            DoctorName = d.Doctor.Name,
-                            d.Doctor.DoctorSpecialty,
-                            d.Doctor.DoctorDegree,
-                            d.BestTimeForVisit,
-                            d.Times,
-                        }),
+                        Doctors = obj.DoctorHospitals
+                                    .Where(obj => obj.LastTimeOfVisitation < lowerB)
+                                    .Where(obj => obj.Times.Any(obj1 => (obj1.EndDay > obj1.StartDay && dayOfWeek <= (int)obj1.EndDay && dayOfWeek >= (int)obj1.StartDay)
+                                                                        || (obj1.EndDay < obj1.StartDay && !(dayOfWeek < (int)obj1.StartDay && dayOfWeek > (int)obj1.EndDay))
+                                                                        || (obj1.EndDay == obj1.StartDay && dayOfWeek == (int)obj1.StartDay)))
+                                    .Select(d => new
+                                    {
+                                        d.DoctorId,
+                                        DoctorName = d.Doctor.Name,
+                                        d.Doctor.DoctorSpecialty,
+                                        d.Doctor.DoctorDegree,
+                                        d.BestTimeForVisit,
+                                        d.Times,
+                                    }),
                     }).ToList();
 
                 var listOfHospitals = new List<HospitalTask>();
@@ -193,6 +202,10 @@ namespace Ortho_matic.Controllers
 
                 var lowerB = DateTime.Now.Subtract(TimeSpan.FromHours(48));
 
+                int dayOfWeek = (int)DateTime.Now.DayOfWeek;
+                dayOfWeek++;
+                dayOfWeek %= 7;
+
                 var clinics = _context.Clinics
                     .Where(obj => obj.Region.Name == user.Region.Name && obj.DoctorClinics.Count != 0)
                     .Select(obj => new
@@ -202,15 +215,20 @@ namespace Ortho_matic.Controllers
                         obj.Phone2,
                         obj.Phone3,
                         obj.Id,
-                        Doctors = obj.DoctorClinics.Where(obj => obj.LastTimeOfVisitation < lowerB).Select(d => new
-                        {
-                            d.DoctorId,
-                            DoctorName = d.Doctor.Name,
-                            d.Doctor.DoctorSpecialty,
-                            d.Doctor.DoctorDegree,
-                            d.BestTimeForVisit,
-                            d.Times,
-                        }),
+                        Doctors = obj.DoctorClinics
+                                    .Where(obj => obj.LastTimeOfVisitation < lowerB)
+                                    .Where(obj => obj.Times.Any(obj1 => (obj1.EndDay > obj1.StartDay && dayOfWeek <= (int)obj1.EndDay && dayOfWeek >= (int)obj1.StartDay)
+                                                                        || (obj1.EndDay < obj1.StartDay && !(dayOfWeek < (int)obj1.StartDay && dayOfWeek > (int)obj1.EndDay))
+                                                                        || (obj1.EndDay == obj1.StartDay && dayOfWeek == (int)obj1.StartDay)))
+                                    .Select(d => new
+                                    {
+                                        d.DoctorId,
+                                        DoctorName = d.Doctor.Name,
+                                        d.Doctor.DoctorSpecialty,
+                                        d.Doctor.DoctorDegree,
+                                        d.BestTimeForVisit,
+                                        d.Times,
+                                    }),
                     }).ToList();
 
                 var listOfClinics = new List<ClinicTask>();
