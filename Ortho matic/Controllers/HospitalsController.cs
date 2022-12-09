@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ortho_matic.Data;
 using Ortho_matic.Models;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -147,7 +148,10 @@ namespace Ortho_matic.Controllers
                     return BadRequest("Hospital must contain address");
                 }
 
-                model.RegionId = user.RegionId;
+                if (model.RegionId == null || !_context.Regions.Any(obj => obj.Id == model.RegionId))
+                {
+                    return BadRequest("Hospital must has area");
+                }
 
                 _context.Hospitals.Add(model);
                 _context.SaveChanges();

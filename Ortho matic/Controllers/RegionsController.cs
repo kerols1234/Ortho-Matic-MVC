@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,36 @@ namespace Ortho_matic.Controllers
                     NumberOfUsers = _context.ApplicationUsers.Count(obj1 => obj1.RegionId == obj.Id)
                 }).ToListAsync()
             });
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult GetAllRegionsMobile()
+        {
+            var claim = User.Claims.FirstOrDefault(obj => obj.Type == "UserName");
+
+            if (claim == null)
+            {
+                return BadRequest("Wrong User");
+            }
+
+            var user = _context.ApplicationUsers.FirstOrDefault(obj => obj.UserName == claim.Value);
+
+            if (user == null)
+            {
+                return BadRequest("This user doe not exist");
+            }
+
+            var list = _context
+                .Regions
+                .Select(obj => new
+                {
+                    obj.Name,
+                    obj.Id
+                })
+                .ToList();
+
+            return Ok(list);
         }
 
         [HttpDelete]

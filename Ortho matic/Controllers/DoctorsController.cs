@@ -73,7 +73,6 @@ namespace Ortho_matic.Controllers
             return Json(new { success = false, message = ModelState.Values });
         }
 
-
         public async Task<IActionResult> Details(int id)
         {
             if (id == 0)
@@ -349,7 +348,10 @@ namespace Ortho_matic.Controllers
 
                 foreach (var item in model.DoctorClinics)
                 {
-                    item.Clinic.RegionId = user.RegionId;
+                    if (item.Clinic == null || item.Clinic.RegionId == null || !_context.Regions.Any(obj => obj.Id == item.Clinic.RegionId))
+                    {
+                        return BadRequest("Clinic must has area");
+                    }
                 }
 
                 _context.Doctors.Add(model);
